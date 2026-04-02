@@ -761,23 +761,31 @@ export default function OnboardingPage() {
             Back
           </button>
 
-          {step < steps.length - 1 ? (
+          <div className="flex items-center gap-3">
+            {step < steps.length - 1 ? (
+              <button
+                onClick={() => setStep((s) => s + 1)}
+                className="rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
+              >
+                Continue
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex items-center gap-2 rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
+              >
+                {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {submitting ? "Provisioning..." : "Launch Agent"}
+              </button>
+            )}
             <button
-              onClick={() => setStep((s) => s + 1)}
-              className="rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
+              onClick={() => router.push("/home")}
+              className="rounded-lg px-4 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
             >
-              Continue
+              Skip for now →
             </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="flex items-center gap-2 rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
-            >
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {submitting ? "Provisioning..." : "Launch Agent"}
-            </button>
-          )}
+          </div>
         </div>
       </div>
     </div>
