@@ -123,33 +123,170 @@ export default function OnboardingPage() {
     }
   };
 
-  // ── Success screen ────────────────────────────────────────────────────
+  // ── Success screen with setup guide ──────────────────────────────────
   if (result) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <Check className="h-8 w-8 text-green-600" />
-        </div>
-        <h2 className="mt-4 text-xl font-bold">You&apos;re All Set!</h2>
-        <p className="mt-2 text-gray-600">{result.message}</p>
-        {result.phone_number && (
-          <div className="mt-6 rounded-lg bg-[#3B6FFF]/10 p-4">
-            <p className="text-sm text-gray-600">Your AI agent phone number:</p>
-            <p className="mt-1 flex items-center justify-center gap-2 text-2xl font-bold text-[#3B6FFF]">
-              <Phone className="h-6 w-6" />
-              {result.phone_number}
-            </p>
-            <p className="mt-2 text-xs text-gray-500">
-              Calls to this number will be answered by your AI assistant
-            </p>
+      <div className="max-w-2xl space-y-6">
+        {/* Header */}
+        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Check className="h-8 w-8 text-green-600" />
           </div>
-        )}
-        <button
-          onClick={() => router.push("/")}
-          className="mt-6 rounded-lg bg-[#3B6FFF] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#2D5FE6]"
-        >
-          Go to Dashboard
-        </button>
+          <h2 className="mt-4 text-xl font-bold">Your AI Agent is Ready!</h2>
+          <p className="mt-2 text-gray-600">{result.message}</p>
+          {result.phone_number && (
+            <div className="mt-6 rounded-lg bg-[#3B6FFF]/10 p-4">
+              <p className="text-sm text-gray-600">Your Ringa phone number:</p>
+              <p className="mt-1 flex items-center justify-center gap-2 text-2xl font-bold text-[#3B6FFF]">
+                <Phone className="h-6 w-6" />
+                {result.phone_number}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Step 1: Forward Calls */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
+              1
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold">Forward Your Business Calls</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                Set up call forwarding on your existing business number so unanswered calls go to Ringa.
+                Your customers keep calling the same number they always have.
+              </p>
+
+              <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                <p className="text-sm font-semibold text-gray-700">How to set it up:</p>
+                <ol className="mt-2 space-y-2 text-sm text-gray-600">
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">1.</span>
+                    Call your phone carrier (AT&T, Verizon, T-Mobile, etc.)
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">2.</span>
+                    Ask for &ldquo;Conditional Call Forwarding&rdquo; (forwards when you don&apos;t answer)
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">3.</span>
+                    Forward to: <span className="font-mono font-semibold text-[#3B6FFF]">{result.phone_number}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">4.</span>
+                    Set the ring time before forwarding (see guide below)
+                  </li>
+                </ol>
+              </div>
+
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-amber-800">Ring Time Guide</p>
+                <p className="mt-1 text-xs text-amber-700">
+                  Choose how long your phone rings before Ringa picks up:
+                </p>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="rounded-lg bg-white p-2 shadow-sm">
+                    <p className="text-lg font-bold text-amber-800">5s</p>
+                    <p className="text-amber-600">~1 ring</p>
+                    <p className="text-gray-500">Ringa answers fast</p>
+                  </div>
+                  <div className="rounded-lg bg-white p-2 shadow-sm ring-2 ring-amber-400">
+                    <p className="text-lg font-bold text-amber-800">10s</p>
+                    <p className="text-amber-600">~2-3 rings</p>
+                    <p className="text-gray-500">Recommended</p>
+                  </div>
+                  <div className="rounded-lg bg-white p-2 shadow-sm">
+                    <p className="text-lg font-bold text-amber-800">15s</p>
+                    <p className="text-amber-600">~4 rings</p>
+                    <p className="text-gray-500">Time to pick up first</p>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-amber-600">
+                  Most carriers use: <span className="font-mono">*61*{result.phone_number}*11*10#</span> to set 10-second forwarding.
+                  Check with your carrier for the exact code.
+                </p>
+              </div>
+
+              <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                <p className="text-sm font-semibold text-gray-700">Quick codes by carrier:</p>
+                <div className="mt-2 space-y-1 text-xs text-gray-600">
+                  <p><span className="font-medium">AT&T / T-Mobile:</span> Dial <span className="font-mono">*61*1{result.phone_number?.replace("+1", "")}*11*10#</span> then press Call</p>
+                  <p><span className="font-medium">Verizon:</span> Dial <span className="font-mono">*71{result.phone_number?.replace("+1", "")}</span> then press Call</p>
+                  <p><span className="font-medium">Landline / VoIP:</span> Contact your provider and ask to forward unanswered calls to {result.phone_number}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 2: Google Calendar Sync */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
+              2
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold">Connect Google Calendar (Optional)</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                If your technicians use Google Calendar, Ringa can sync appointments automatically.
+                Bookings made by the AI agent will appear on their calendars, and events they add
+                will block those time slots.
+              </p>
+
+              <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                <p className="text-sm font-semibold text-gray-700">For each technician:</p>
+                <ol className="mt-2 space-y-2 text-sm text-gray-600">
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">1.</span>
+                    Open Google Calendar &rarr; Settings &rarr; click on the calendar
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">2.</span>
+                    Scroll to &ldquo;Share with specific people&rdquo;
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">3.</span>
+                    Add this email:
+                  </li>
+                </ol>
+                <div className="mt-2 rounded-lg border border-[#3B6FFF]/20 bg-[#3B6FFF]/5 p-3">
+                  <p className="break-all text-center font-mono text-sm font-medium text-[#3B6FFF]">
+                    hvac-calendar@hvac-agent-492101.iam.gserviceaccount.com
+                  </p>
+                </div>
+                <ol className="mt-2 space-y-2 text-sm text-gray-600" start={4}>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">4.</span>
+                    Set permission to &ldquo;Make changes to events&rdquo;
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="font-medium text-gray-800">5.</span>
+                    Go to Dashboard &rarr; Technicians &rarr; set Calendar Provider to &ldquo;Google&rdquo; and paste the calendar ID (usually the technician&apos;s email)
+                  </li>
+                </ol>
+              </div>
+
+              <p className="mt-3 text-xs text-gray-500">
+                This step is optional. Without calendar sync, Ringa still books appointments
+                based on the working hours you configured. You can set this up later in the Dashboard.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Go to Dashboard */}
+        <div className="text-center">
+          <button
+            onClick={() => router.push("/home")}
+            className="rounded-lg bg-[#3B6FFF] px-8 py-3 text-sm font-medium text-white hover:bg-[#2D5FE6]"
+          >
+            Go to Dashboard
+          </button>
+          <p className="mt-2 text-xs text-gray-400">
+            You can always find these instructions in Settings
+          </p>
+        </div>
       </div>
     );
   }
