@@ -111,14 +111,14 @@ export default function TechniciansPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Technicians</h1>
           <p className="mt-1 text-gray-500">Manage technicians, schedules, and calendar sync</p>
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
         >
           <Plus className="h-4 w-4" /> Add Technician
         </button>
@@ -194,15 +194,15 @@ export default function TechniciansPage() {
           technicians.map((tech) => (
             <div key={tech.id} className="rounded-lg border border-gray-200 bg-white">
               {/* Header */}
-              <div className="flex items-center justify-between p-4">
-                <div className="flex-1">
+              <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{tech.name}</p>
                     {!tech.is_active && (
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-700">Inactive</span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500">{tech.phone} {tech.email && `| ${tech.email}`}</p>
+                  <p className="text-sm text-gray-500 truncate">{tech.phone} {tech.email && `| ${tech.email}`}</p>
                   <div className="mt-1 flex flex-wrap gap-2">
                     {tech.specialties && <span className="text-xs text-gray-400">{tech.specialties}</span>}
                     {tech.works_after_hours && <span className="rounded bg-orange-100 px-1.5 py-0.5 text-xs text-orange-600">After Hours</span>}
@@ -310,10 +310,10 @@ function SchedulePanel({ technicianId }: { technicianId: string }) {
         <Clock className="h-4 w-4 text-gray-600" />
         <h4 className="text-sm font-semibold">Working Hours</h4>
       </div>
-      <div className="mt-3 space-y-2">
+      <div className="mt-3 space-y-2 overflow-x-auto">
         {schedule.map((day) => (
-          <div key={day.day_of_week} className="flex items-center gap-3 text-sm">
-            <label className="flex w-28 items-center gap-2">
+          <div key={day.day_of_week} className="flex items-center gap-3 text-sm min-w-[340px]">
+            <label className="flex w-28 shrink-0 items-center gap-2">
               <input type="checkbox" checked={day.is_working}
                 onChange={(e) => updateDay(day.day_of_week, "is_working", e.target.checked)}
                 className="rounded border-gray-300" />
@@ -352,7 +352,7 @@ function SchedulePanel({ technicianId }: { technicianId: string }) {
         <CalendarOff className="h-4 w-4 text-gray-600" />
         <h4 className="text-sm font-semibold">Time Off / Blocked Dates</h4>
       </div>
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <input type="date" value={newTimeOff.date}
           onChange={(e) => setNewTimeOff({ ...newTimeOff, date: e.target.value })}
           className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs" />
@@ -360,7 +360,7 @@ function SchedulePanel({ technicianId }: { technicianId: string }) {
           onChange={(e) => setNewTimeOff({ ...newTimeOff, note: e.target.value })}
           className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs" />
         <button onClick={handleAddTimeOff} disabled={!newTimeOff.date}
-          className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-50 disabled:opacity-50">
+          className="flex items-center justify-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-50 disabled:opacity-50">
           <Plus className="h-3.5 w-3.5" /> Add
         </button>
       </div>

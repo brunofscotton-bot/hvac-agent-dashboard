@@ -46,7 +46,7 @@ export default function PricingPage() {
       <h1 className="text-2xl font-bold">Pricing</h1>
       <p className="mt-1 text-gray-500">Configure your service visit fees</p>
 
-      <div className="mt-6 max-w-xl space-y-6 rounded-lg border border-gray-200 bg-white p-6">
+      <div className="mt-6 w-full max-w-xl space-y-6 rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
         {/* Regular Fee */}
         <div>
           <label className="block text-sm font-medium text-gray-700">

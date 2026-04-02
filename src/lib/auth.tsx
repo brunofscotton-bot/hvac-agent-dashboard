@@ -62,11 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const saveToken = (t: string) => {
     localStorage.setItem(TOKEN_KEY, t);
+    document.cookie = `${TOKEN_KEY}=${t}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     setToken(t);
   };
 
   const clearToken = () => {
     localStorage.removeItem(TOKEN_KEY);
+    document.cookie = `${TOKEN_KEY}=; path=/; max-age=0`;
     setToken(null);
     setCompany(null);
   };

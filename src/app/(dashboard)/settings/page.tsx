@@ -45,7 +45,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold">Settings</h1>
       <p className="mt-1 text-gray-500">Manage your company information</p>
 
-      <div className="mt-6 max-w-xl space-y-8">
+      <div className="mt-6 w-full max-w-xl space-y-8">
         {/* Company Info */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -115,17 +115,21 @@ export default function SettingsPage() {
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Vapi.ai (AI Agent)</span>
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Connected</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.vapi_assistant_id ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                {company.vapi_assistant_id ? "Connected" : "Not Provisioned"}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Twilio (Phone & SMS)</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.twilio_phone_number ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.twilio_phone_number ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                 {company.twilio_phone_number ? "Connected" : "Not Configured"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Google Calendar</span>
-              <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Connected</span>
+              <span className="text-sm text-gray-600">Onboarding</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.onboarding_completed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                {company.onboarding_completed ? "Complete" : "Pending"}
+              </span>
             </div>
           </div>
         </div>

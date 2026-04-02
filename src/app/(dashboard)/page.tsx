@@ -30,7 +30,7 @@ export default function DashboardPage() {
       <p className="mt-1 text-gray-500">Overview of your HVAC service operations</p>
 
       {/* Stats Grid */}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           title="Today's Appointments"
           value={stats?.today_appointments ?? 0}
@@ -70,7 +70,7 @@ export default function DashboardPage() {
             todayAppts.map((appt) => (
               <div
                 key={appt.id}
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4"
+                className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col items-center rounded-lg bg-blue-50 px-3 py-2">
@@ -91,7 +91,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <p className="text-sm font-medium">{appt.technician?.name ?? "Unassigned"}</p>
                   <span
                     className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${

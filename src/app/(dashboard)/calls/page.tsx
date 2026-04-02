@@ -54,7 +54,7 @@ export default function CallsPage() {
       <p className="mt-1 text-gray-500">All incoming calls handled by the AI agent</p>
 
       <div className="mt-6 overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-left text-sm">
+        <table className="min-w-[700px] w-full text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50">
             <tr>
               <th className="px-4 py-3 font-medium text-gray-600">Date</th>

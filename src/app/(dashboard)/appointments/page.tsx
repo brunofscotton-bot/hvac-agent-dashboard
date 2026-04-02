@@ -41,7 +41,7 @@ export default function AppointmentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Appointments</h1>
           <p className="mt-1 text-gray-500">Manage all service appointments</p>
@@ -49,7 +49,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="mt-6 flex gap-3">
+      <div className="mt-4 flex gap-3 sm:mt-6">
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
@@ -66,7 +66,7 @@ export default function AppointmentsPage() {
 
       {/* Table */}
       <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-left text-sm">
+        <table className="min-w-[700px] w-full text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50">
             <tr>
               <th className="px-4 py-3 font-medium text-gray-600">Date & Time</th>
@@ -137,7 +137,7 @@ export default function AppointmentsPage() {
 
       {/* Pagination */}
       {data && data.total > data.per_page && (
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-500">
             Showing {(page - 1) * data.per_page + 1}-{Math.min(page * data.per_page, data.total)} of {data.total}
           </p>
