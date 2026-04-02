@@ -16,6 +16,12 @@ import {
 import { getAdminCompanies, getAdminStats, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
 import type { AdminCompany, AdminPlatformStats } from "@/lib/api";
 
+const API_BASE = "/api";
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("hvac_token");
+}
+
 function StatCard({
   label,
   value,
@@ -67,6 +73,14 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    twilio_phone_number: "",
+    vapi_assistant_id: "",
+    onboarding_completed: false,
+    subscription_status: "",
+    is_active: true,
+  });
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to delete "${name}" and ALL its data? This also releases the Twilio number and deletes the Vapi assistant. This cannot be undone.`)) return;
@@ -90,6 +104,46 @@ export default function AdminPage() {
     try {
       await resetAdminOnboarding(id);
       setCompanies((prev) => prev.map((c) => c.id === id ? { ...c, onboarding_completed: false } : c));
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const startEditing = (c: AdminCompany) => {
+    setEditingId(c.id);
+    setEditForm({
+      twilio_phone_number: c.twilio_phone_number || "",
+      vapi_assistant_id: "",
+      onboarding_completed: c.onboarding_completed,
+      subscription_status: c.subscription_status || "",
+      is_active: c.is_active,
+    });
+  };
+
+  const handleSaveEdit = async (id: string) => {
+    setActionLoading(id);
+    try {
+      const token = getToken();
+      const body: Record<string, any> = {};
+      if (editForm.twilio_phone_number) body.twilio_phone_number = editForm.twilio_phone_number;
+      if (editForm.vapi_assistant_id) body.vapi_assistant_id = editForm.vapi_assistant_id;
+      body.onboarding_completed = editForm.onboarding_completed;
+      body.is_active = editForm.is_active;
+      if (editForm.subscription_status) body.subscription_status = editForm.subscription_status;
+
+      const res = await fetch(`${API_BASE}/admin/companies/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error((await res.json()).detail || "Update failed");
+
+      // Refresh
+      const updated = await getAdminCompanies();
+      setCompanies(updated);
+      setEditingId(null);
     } catch (err: any) {
       alert("Error: " + err.message);
     } finally {
@@ -272,23 +326,102 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      {/* Admin actions */}
-                      <div className="mt-4 flex items-center gap-3 border-t border-gray-200 pt-4">
-                        <button
-                          onClick={() => handleResetOnboarding(c.id, c.name)}
-                          disabled={actionLoading === c.id}
-                          className="rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-1.5 text-xs font-medium text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
-                        >
-                          {actionLoading === c.id ? "..." : "Reset Onboarding"}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(c.id, c.name)}
-                          disabled={actionLoading === c.id}
-                          className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
-                        >
-                          {actionLoading === c.id ? "Deleting..." : "Delete Company"}
-                        </button>
-                      </div>
+                      {/* Edit form */}
+                      {editingId === c.id ? (
+                        <div className="mt-4 border-t border-gray-200 pt-4">
+                          <p className="text-xs font-semibold text-gray-600 uppercase mb-3">Edit Company</p>
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Twilio Phone Number</label>
+                              <input
+                                value={editForm.twilio_phone_number}
+                                onChange={(e) => setEditForm({ ...editForm, twilio_phone_number: e.target.value })}
+                                className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm font-mono"
+                                placeholder="+1321XXXXXXX"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Vapi Assistant ID</label>
+                              <input
+                                value={editForm.vapi_assistant_id}
+                                onChange={(e) => setEditForm({ ...editForm, vapi_assistant_id: e.target.value })}
+                                className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm font-mono"
+                                placeholder="uuid"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Subscription Status</label>
+                              <select
+                                value={editForm.subscription_status}
+                                onChange={(e) => setEditForm({ ...editForm, subscription_status: e.target.value })}
+                                className="w-full rounded border border-gray-300 px-2.5 py-1.5 text-sm"
+                              >
+                                <option value="">None</option>
+                                <option value="active">Active</option>
+                                <option value="trialing">Trialing</option>
+                                <option value="canceled">Canceled</option>
+                                <option value="past_due">Past Due</option>
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-4 pt-4">
+                              <label className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.onboarding_completed}
+                                  onChange={(e) => setEditForm({ ...editForm, onboarding_completed: e.target.checked })}
+                                />
+                                Onboarded
+                              </label>
+                              <label className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={editForm.is_active}
+                                  onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
+                                />
+                                Active
+                              </label>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              onClick={() => handleSaveEdit(c.id)}
+                              disabled={actionLoading === c.id}
+                              className="rounded-lg bg-[#3B6FFF] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
+                            >
+                              {actionLoading === c.id ? "Saving..." : "Save Changes"}
+                            </button>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              className="rounded-lg border border-gray-300 px-4 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4 flex items-center gap-3 border-t border-gray-200 pt-4">
+                          <button
+                            onClick={() => startEditing(c)}
+                            className="rounded-lg border border-[#3B6FFF]/30 bg-[#3B6FFF]/5 px-3 py-1.5 text-xs font-medium text-[#3B6FFF] hover:bg-[#3B6FFF]/10"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleResetOnboarding(c.id, c.name)}
+                            disabled={actionLoading === c.id}
+                            className="rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-1.5 text-xs font-medium text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+                          >
+                            {actionLoading === c.id ? "..." : "Reset Onboarding"}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(c.id, c.name)}
+                            disabled={actionLoading === c.id}
+                            className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                          >
+                            {actionLoading === c.id ? "Deleting..." : "Delete Company"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
