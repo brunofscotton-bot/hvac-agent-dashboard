@@ -112,6 +112,11 @@ export const createPortal = (returnUrl: string) =>
 export const getSubscription = () => fetchAPI<SubscriptionInfo>("/billing/subscription");
 export const getInvoices = () => fetchAPI<{ invoices: Invoice[] }>("/billing/invoices");
 
+// Admin (platform owner)
+export const getAdminCompanies = () => fetchAPI<AdminCompany[]>("/admin/companies");
+export const getAdminStats = () => fetchAPI<AdminPlatformStats>("/admin/stats");
+export const getAdminCompanyDetail = (id: string) => fetchAPI<AdminCompanyDetail>(`/admin/companies/${id}`);
+
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface DashboardStats {
@@ -318,4 +323,49 @@ export interface CustomerStats {
   total_customers: number;
   new_this_month: number;
   with_appointments_this_month: number;
+}
+
+// Admin types
+export interface AdminCompany {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  city?: string;
+  state?: string;
+  twilio_phone_number?: string;
+  subscription_status?: string;
+  subscription_plan?: string;
+  onboarding_completed: boolean;
+  is_active: boolean;
+  created_at: string;
+  technician_count: number;
+  appointment_count: number;
+  call_count: number;
+}
+
+export interface AdminCompanyDetail extends AdminCompany {
+  address?: string;
+  languages_supported?: string;
+  agent_name?: string;
+  service_fee?: number;
+  after_hours_fee?: number;
+  business_hours_start?: number;
+  business_hours_end?: number;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  vapi_assistant_id?: string;
+  updated_at?: string;
+}
+
+export interface AdminPlatformStats {
+  total_companies: number;
+  active_companies: number;
+  active_subscriptions: number;
+  trialing_subscriptions: number;
+  onboarding_completed_count: number;
+  total_calls_this_month: number;
+  total_appointments_this_month: number;
+  total_technicians: number;
+  revenue_estimate: number;
 }

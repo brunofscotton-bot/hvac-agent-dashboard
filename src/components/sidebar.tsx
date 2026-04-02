@@ -11,13 +11,15 @@ import {
   DollarSign,
   Phone,
   Settings,
-  Snowflake,
   CreditCard,
   LogOut,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+
+const ADMIN_EMAILS = ["bruno.f.scotton@gmail.com"];
 
 const navItems = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
@@ -37,8 +39,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-gray-200 px-6 py-5">
-        <Snowflake className="h-7 w-7 text-[#3B6FFF]" />
-        <span className="text-lg font-bold text-gray-900">Ringa</span>
+        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="18" width="3.5" height="12" rx="1.75" fill="#7C3FFF" opacity="0.6" />
+          <rect x="12" y="12" width="3.5" height="24" rx="1.75" fill="#6B5FFF" opacity="0.8" />
+          <rect x="18" y="6" width="3.5" height="36" rx="1.75" fill="#5B7FFF" />
+          <rect x="24" y="3" width="3.5" height="42" rx="1.75" fill="#3B6FFF" />
+          <rect x="30" y="6" width="3.5" height="36" rx="1.75" fill="#5B7FFF" />
+          <rect x="36" y="12" width="3.5" height="24" rx="1.75" fill="#6B5FFF" opacity="0.8" />
+          <rect x="42" y="18" width="3.5" height="12" rx="1.75" fill="#7C3FFF" opacity="0.6" />
+        </svg>
+        <span className="text-lg font-bold text-gray-900">ringa</span>
       </div>
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
         {navItems.map((item) => {
@@ -61,6 +71,25 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             </Link>
           );
         })}
+
+        {/* Admin link — only for platform owner */}
+        {company && ADMIN_EMAILS.includes(company.email) && (
+          <>
+            <div className="mx-3 my-2 border-t border-gray-200" />
+            <Link
+              href="/admin"
+              onClick={onNavigate}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                pathname.startsWith("/admin")
+                  ? "bg-[#7C3FFF]/10 text-[#7C3FFF]"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              <Shield className="h-5 w-5" />
+              Admin Panel
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Bottom section */}
