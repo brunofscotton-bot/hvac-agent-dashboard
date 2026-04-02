@@ -1,21 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Building, Phone } from "lucide-react";
-import { getCompany, updateCompany, type Company } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
+import { Save, Building, Phone, Link2, Unlink } from "lucide-react";
+import { getCompany, updateCompany, getJobberStatus, disconnectJobber, type Company } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [jobberConnected, setJobberConnected] = useState(false);
+  const [jobberLoading, setJobberLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const { token } = useAuth();
 
   useEffect(() => {
     getCompany()
       .then(setCompany)
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    getJobberStatus()
+      .then((s) => setJobberConnected(s.connected))
+      .catch(() => {});
   }, []);
+
+  // Handle Jobber OAuth redirect result
+  useEffect(() => {
+    const jobberParam = searchParams.get("jobber");
+    if (jobberParam === "connected") {
+      setJobberConnected(true);
+    }
+  }, [searchParams]);
 
   const handleSave = async () => {
     if (!company) return;
@@ -109,6 +127,51 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Jobber Integration */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <Link2 className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Jobber Integration</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Connect Jobber to automatically sync appointments, clients, and job details.
+          </p>
+          <div className="mt-4 flex items-center gap-3">
+            {jobberConnected ? (
+              <>
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                  Connected
+                </span>
+                <button
+                  onClick={async () => {
+                    setJobberLoading(true);
+                    try {
+                      await disconnectJobber();
+                      setJobberConnected(false);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    setJobberLoading(false);
+                  }}
+                  disabled={jobberLoading}
+                  className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+                >
+                  <Unlink className="h-3.5 w-3.5" />
+                  {jobberLoading ? "Disconnecting..." : "Disconnect"}
+                </button>
+              </>
+            ) : (
+              <a
+                href={`/api/integrations/jobber/connect?token=${token}`}
+                className="flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+              >
+                <Link2 className="h-4 w-4" />
+                Connect Jobber
+              </a>
+            )}
+          </div>
+        </div>
+
         {/* Integration Status */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="text-lg font-semibold">Integration Status</h2>
@@ -123,6 +186,12 @@ export default function SettingsPage() {
               <span className="text-sm text-gray-600">Twilio (Phone & SMS)</span>
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.twilio_phone_number ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                 {company.twilio_phone_number ? "Connected" : "Not Configured"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Jobber</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${jobberConnected ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                {jobberConnected ? "Connected" : "Not Connected"}
               </span>
             </div>
             <div className="flex items-center justify-between">

@@ -122,6 +122,11 @@ export const resetAdminOnboarding = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
 export const getAdminCosts = () => fetchAPI<AdminInfraCosts>("/admin/costs");
 
+// Integrations (Jobber)
+export const getJobberStatus = () => fetchAPI<{ connected: boolean }>("/integrations/jobber/status");
+export const disconnectJobber = () =>
+  fetchAPI<{ success: boolean; message: string }>("/integrations/jobber/disconnect", { method: "POST" });
+
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface DashboardStats {
