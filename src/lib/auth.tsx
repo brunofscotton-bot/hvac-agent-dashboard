@@ -39,7 +39,7 @@ interface AuthContextType {
 const TOKEN_KEY = "hvac_token";
 const API_BASE = "/api";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password"];
 const LANDING_PATH = "/";
 
 // ── Context ─────────────────────────────────────────────────────────────────
