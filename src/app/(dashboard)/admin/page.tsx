@@ -13,8 +13,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getAdminCompanies, getAdminStats, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
-import type { AdminCompany, AdminPlatformStats } from "@/lib/api";
+import { getAdminCompanies, getAdminStats, getAdminCosts, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
+import type { AdminCompany, AdminPlatformStats, AdminInfraCosts } from "@/lib/api";
 
 const API_BASE = "/api";
 function getToken(): string | null {
@@ -69,8 +69,11 @@ function StatusBadge({ status }: { status?: string }) {
 export default function AdminPage() {
   const [companies, setCompanies] = useState<AdminCompany[]>([]);
   const [stats, setStats] = useState<AdminPlatformStats | null>(null);
+  const [costs, setCosts] = useState<AdminInfraCosts | null>(null);
+  const [costsLoading, setCostsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [tab, setTab] = useState<"overview" | "costs">("overview");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -151,6 +154,19 @@ export default function AdminPage() {
     }
   };
 
+  const loadCosts = async () => {
+    if (costs) return; // already loaded
+    setCostsLoading(true);
+    try {
+      const c = await getAdminCosts();
+      setCosts(c);
+    } catch (err: any) {
+      alert("Failed to load costs: " + err.message);
+    } finally {
+      setCostsLoading(false);
+    }
+  };
+
   useEffect(() => {
     Promise.all([getAdminCompanies(), getAdminStats()])
       .then(([c, s]) => {
@@ -221,7 +237,93 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Tabs */}
+      <div className="mb-6 flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+        <button
+          onClick={() => setTab("overview")}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            tab === "overview" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Companies
+        </button>
+        <button
+          onClick={() => { setTab("costs"); loadCosts(); }}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            tab === "costs" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Infrastructure Costs
+        </button>
+      </div>
+
+      {/* Costs tab */}
+      {tab === "costs" && (
+        <div className="rounded-xl border border-gray-200 bg-white">
+          {costsLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-[#3B6FFF] border-t-transparent" />
+            </div>
+          ) : costs ? (
+            <>
+              <div className="border-b border-gray-200 px-6 py-4">
+                <h2 className="font-semibold text-gray-900">
+                  Infrastructure Costs — {costs.period}
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 p-6 sm:grid-cols-4">
+                <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                  <p className="text-xs text-gray-500">Twilio Numbers</p>
+                  <p className="text-lg font-semibold">{costs.twilio_phone_numbers}</p>
+                  <p className="text-xs text-gray-400">${costs.twilio_number_cost.toFixed(2)}/mo</p>
+                </div>
+                <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                  <p className="text-xs text-gray-500">Twilio Calls</p>
+                  <p className="text-lg font-semibold">{costs.twilio_call_minutes.toFixed(1)} min</p>
+                  <p className="text-xs text-gray-400">${costs.twilio_call_cost.toFixed(2)}</p>
+                </div>
+                <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                  <p className="text-xs text-gray-500">Vapi AI Calls</p>
+                  <p className="text-lg font-semibold">{costs.vapi_call_count}</p>
+                  <p className="text-xs text-gray-400">${costs.vapi_total_cost.toFixed(2)}</p>
+                </div>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                  <p className="text-xs text-blue-600 font-medium">Total Cost</p>
+                  <p className="text-2xl font-bold text-blue-700">${costs.total_cost.toFixed(2)}</p>
+                  <p className="text-xs text-blue-500">this month</p>
+                </div>
+              </div>
+
+              {/* Per-company breakdown */}
+              {costs.per_company.length > 0 && (
+                <div className="border-t border-gray-200 px-6 py-4">
+                  <h3 className="mb-3 text-sm font-semibold text-gray-700">Cost per Company</h3>
+                  <div className="divide-y divide-gray-100">
+                    {costs.per_company.map((cc) => (
+                      <div key={cc.company_id} className="flex items-center justify-between py-3">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{cc.company_name}</p>
+                          <p className="text-xs text-gray-400 font-mono">{cc.phone_number}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-gray-900">${cc.estimated_cost.toFixed(2)}</p>
+                          <p className="text-xs text-gray-400">{cc.call_count} calls</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="px-6 py-12 text-center text-gray-500">Failed to load costs.</div>
+          )}
+        </div>
+      )}
+
       {/* Companies table */}
+      {tab === "overview" && (
       <div className="rounded-xl border border-gray-200 bg-white">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2 className="font-semibold text-gray-900">
@@ -430,6 +532,7 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

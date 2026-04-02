@@ -120,6 +120,7 @@ export const deleteAdminCompany = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}`, { method: "DELETE" });
 export const resetAdminOnboarding = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
+export const getAdminCosts = () => fetchAPI<AdminInfraCosts>("/admin/costs");
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -372,4 +373,24 @@ export interface AdminPlatformStats {
   total_appointments_this_month: number;
   total_technicians: number;
   revenue_estimate: number;
+}
+
+export interface AdminCompanyCost {
+  company_id: string;
+  company_name: string;
+  phone_number: string;
+  call_count: number;
+  estimated_cost: number;
+}
+
+export interface AdminInfraCosts {
+  period: string;
+  twilio_phone_numbers: number;
+  twilio_number_cost: number;
+  twilio_call_minutes: number;
+  twilio_call_cost: number;
+  vapi_total_cost: number;
+  vapi_call_count: number;
+  total_cost: number;
+  per_company: AdminCompanyCost[];
 }
