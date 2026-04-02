@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Save, Building, Phone, Link2, Unlink } from "lucide-react";
-import { getCompany, updateCompany, getJobberStatus, disconnectJobber, type Company } from "@/lib/api";
+import { Save, Building, Phone, Link2, Unlink, Calendar, Send } from "lucide-react";
+import { getCompany, updateCompany, getJobberStatus, disconnectJobber, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
@@ -13,6 +13,9 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [jobberConnected, setJobberConnected] = useState(false);
   const [jobberLoading, setJobberLoading] = useState(false);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [sendingSmsTo, setSendingSmsTo] = useState<string | null>(null);
+  const [smsSent, setSmsSent] = useState<Set<string>>(new Set());
   const searchParams = useSearchParams();
   const { token } = useAuth();
 
@@ -24,6 +27,10 @@ export default function SettingsPage() {
 
     getJobberStatus()
       .then((s) => setJobberConnected(s.connected))
+      .catch(() => {});
+
+    getTechnicians()
+      .then(setTechnicians)
       .catch(() => {});
   }, []);
 
@@ -127,6 +134,79 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Google Calendar Sync */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Google Calendar Sync</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Sync technician calendars to automatically block busy times and prevent double-booking.
+            Click &quot;Send Setup Link&quot; and the technician will receive an SMS — they just tap the link, sign in to Google, and they&apos;re connected.
+          </p>
+
+          {/* Technician Calendar Status */}
+          <div className="mt-4 space-y-2">
+            {technicians.length === 0 ? (
+              <p className="text-sm text-gray-400">No technicians added yet. Go to Technicians to add one.</p>
+            ) : (
+              technicians.filter(t => t.is_active).map((tech) => (
+                <div key={tech.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{tech.name}</span>
+                    {tech.calendar_provider === "google" && tech.google_calendar_id ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        Connected
+                      </span>
+                    ) : tech.calendar_provider === "google" ? (
+                      <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                        Pending
+                      </span>
+                    ) : tech.calendar_provider === "microsoft" ? (
+                      <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                        Outlook
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                        No sync
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={async () => {
+                      setSendingSmsTo(tech.id);
+                      try {
+                        await sendCalendarInstructions(tech.id);
+                        setSmsSent((prev) => new Set(prev).add(tech.id));
+                      } catch (e) {
+                        console.error(e);
+                      }
+                      setSendingSmsTo(null);
+                    }}
+                    disabled={sendingSmsTo === tech.id || smsSent.has(tech.id) || (tech.calendar_provider === "google" && !!tech.google_calendar_id) || tech.calendar_provider !== "google"}
+                    className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs hover:bg-white disabled:opacity-50"
+                  >
+                    <Send className="h-3 w-3" />
+                    {tech.calendar_provider !== "google"
+                      ? "—"
+                      : tech.google_calendar_id
+                      ? "Connected"
+                      : smsSent.has(tech.id)
+                      ? "Sent!"
+                      : sendingSmsTo === tech.id
+                      ? "Sending..."
+                      : "Send Link"}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+          <p className="mt-3 text-xs text-gray-400">
+            First add technicians on the Technicians page. Then click &quot;Send Setup Link&quot; here — the technician
+            receives an SMS, taps the link, signs in to Google, and the calendar connects automatically.
+          </p>
+        </div>
+
         {/* Jobber Integration */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -187,6 +267,18 @@ export default function SettingsPage() {
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.twilio_phone_number ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                 {company.twilio_phone_number ? "Connected" : "Not Configured"}
               </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Google Calendar</span>
+              {(() => {
+                const calTechs = technicians.filter(t => t.is_active && t.calendar_provider === "google");
+                const totalActive = technicians.filter(t => t.is_active).length;
+                return (
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${calTechs.length > 0 ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                    {calTechs.length > 0 ? `${calTechs.length}/${totalActive} Technicians` : "Not Configured"}
+                  </span>
+                );
+              })()}
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Jobber</span>

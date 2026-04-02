@@ -122,6 +122,10 @@ export const resetAdminOnboarding = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
 export const getAdminCosts = () => fetchAPI<AdminInfraCosts>("/admin/costs");
 
+// Google Calendar
+export const sendCalendarInstructions = (techId: string) =>
+  fetchAPI<{ success: boolean; message_sid: string }>(`/technicians/${techId}/send-calendar-instructions`, { method: "POST" });
+
 // Integrations (Jobber)
 export const getJobberStatus = () => fetchAPI<{ connected: boolean }>("/integrations/jobber/status");
 export const disconnectJobber = () =>
@@ -252,7 +256,7 @@ export interface OnboardingData {
     name: string;
     phone: string;
     email?: string;
-    google_calendar_id?: string;
+    calendar_provider?: string;
     specialties?: string;
     works_after_hours: boolean;
     works_weekends: boolean;
@@ -262,6 +266,7 @@ export interface OnboardingData {
   greeting_message?: string;
   voice_gender: string;
   area_code: string;
+  send_calendar_sms?: boolean;
 }
 
 export interface OnboardingResult {

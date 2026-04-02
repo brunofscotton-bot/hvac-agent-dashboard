@@ -31,7 +31,6 @@ interface TechForm {
   phone: string;
   email: string;
   calendar_provider: string;
-  google_calendar_id: string;
   specialties: string;
   works_after_hours: boolean;
   works_weekends: boolean;
@@ -42,7 +41,6 @@ const emptyTech: TechForm = {
   phone: "",
   email: "",
   calendar_provider: "none",
-  google_calendar_id: "",
   specialties: "",
   works_after_hours: false,
   works_weekends: false,
@@ -78,6 +76,7 @@ export default function OnboardingPage() {
   });
 
   const [technicians, setTechnicians] = useState<TechForm[]>([{ ...emptyTech }]);
+  const [sendCalendarSms, setSendCalendarSms] = useState(true);
 
   const updateForm = (key: string, value: any) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -110,6 +109,7 @@ export default function OnboardingPage() {
       ...form,
       technicians: technicians.filter((t) => t.name && t.phone),
       greeting_message: form.greeting_message || undefined,
+      send_calendar_sms: sendCalendarSms,
     };
 
     try {
@@ -221,59 +221,46 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step 2: Google Calendar Sync */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
-              2
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold">Connect Google Calendar (Optional)</h3>
-              <p className="mt-1 text-sm text-gray-600">
-                If your technicians use Google Calendar, Ringa can sync appointments automatically.
-                Bookings made by the AI agent will appear on their calendars, and events they add
-                will block those time slots.
-              </p>
-
-              <div className="mt-4 rounded-lg bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-gray-700">For each technician:</p>
-                <ol className="mt-2 space-y-2 text-sm text-gray-600">
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">1.</span>
-                    Open Google Calendar &rarr; Settings &rarr; click on the calendar
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">2.</span>
-                    Scroll to &ldquo;Share with specific people&rdquo;
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">3.</span>
-                    Add this email:
-                  </li>
-                </ol>
-                <div className="mt-2 rounded-lg border border-[#3B6FFF]/20 bg-[#3B6FFF]/5 p-3">
-                  <p className="break-all text-center font-mono text-sm font-medium text-[#3B6FFF]">
-                    hvac-calendar@hvac-agent-492101.iam.gserviceaccount.com
-                  </p>
-                </div>
-                <ol className="mt-2 space-y-2 text-sm text-gray-600" start={4}>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">4.</span>
-                    Set permission to &ldquo;Make changes to events&rdquo;
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">5.</span>
-                    Go to Dashboard &rarr; Technicians &rarr; set Calendar Provider to &ldquo;Google&rdquo; and paste the calendar ID (usually the technician&apos;s email)
-                  </li>
-                </ol>
+        {technicians.some((t) => t.calendar_provider === "google") && (
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
+                2
               </div>
-
-              <p className="mt-3 text-xs text-gray-500">
-                This step is optional. Without calendar sync, Ringa still books appointments
-                based on the working hours you configured. You can set this up later in the Dashboard.
-              </p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold">Google Calendar Sync</h3>
+                {sendCalendarSms ? (
+                  <>
+                    <p className="mt-1 text-sm text-gray-600">
+                      We sent a setup link via SMS to your technicians with Google Calendar enabled.
+                      They just need to tap the link, sign in to Google, and click &ldquo;Allow&rdquo;.
+                    </p>
+                    <div className="mt-4 rounded-lg bg-green-50 border border-green-200 p-4">
+                      <p className="text-sm font-medium text-green-800">SMS sent to:</p>
+                      <div className="mt-2 space-y-1">
+                        {technicians
+                          .filter((t) => t.name && t.calendar_provider === "google")
+                          .map((t, i) => (
+                            <p key={i} className="text-sm text-green-700">
+                              {t.name} — {t.phone}
+                            </p>
+                          ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="mt-1 text-sm text-gray-600">
+                    You chose to set up calendar sync later. Go to <span className="font-semibold">Settings → Google Calendar Sync</span> to
+                    send setup links to your technicians.
+                  </p>
+                )}
+                <p className="mt-3 text-xs text-gray-500">
+                  You can check the connection status anytime in Settings → Google Calendar Sync.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Go to Dashboard */}
         <div className="text-center">
@@ -543,12 +530,9 @@ export default function OnboardingPage() {
                     <option value="microsoft">Microsoft Outlook</option>
                   </select>
                   {tech.calendar_provider === "google" && (
-                    <input
-                      placeholder="Google Calendar ID (email)"
-                      value={tech.google_calendar_id}
-                      onChange={(e) => updateTech(i, "google_calendar_id", e.target.value)}
-                      className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    />
+                    <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
+                      After onboarding, this technician will receive an SMS with a link to connect their Google Calendar — one tap, sign in, done.
+                    </div>
                   )}
                   <input
                     placeholder="Specialties (AC, Heating, Duct)"
@@ -581,6 +565,29 @@ export default function OnboardingPage() {
                 </div>
               </div>
             ))}
+
+            {/* Calendar SMS opt-in */}
+            {technicians.some((t) => t.calendar_provider === "google") && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={sendCalendarSms}
+                    onChange={(e) => setSendCalendarSms(e.target.checked)}
+                    className="mt-0.5 rounded border-gray-300"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Send Google Calendar setup link via SMS
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Each technician with Google Calendar selected will receive an SMS with a link to authorize calendar access.
+                      You can also do this manually later in Settings.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
         )}
 
@@ -722,7 +729,7 @@ export default function OnboardingPage() {
                   .map((t, i) => (
                     <p key={i} className="mt-1 text-sm">
                       {t.name} — {t.phone}
-                      {t.google_calendar_id && " (Calendar linked)"}
+                      {t.calendar_provider === "google" && " (Google Calendar)"}
                     </p>
                   ))}
               </div>

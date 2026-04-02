@@ -47,7 +47,6 @@ export default function TechniciansPage() {
     name: "",
     phone: "",
     email: "",
-    google_calendar_id: "",
     calendar_provider: "none",
     specialties: "",
     works_after_hours: false,
@@ -68,7 +67,7 @@ export default function TechniciansPage() {
 
   const resetForm = () => {
     setForm({
-      name: "", phone: "", email: "", google_calendar_id: "",
+      name: "", phone: "", email: "",
       calendar_provider: "none", specialties: "",
       works_after_hours: false, works_weekends: false,
     });
@@ -92,7 +91,6 @@ export default function TechniciansPage() {
       name: tech.name,
       phone: tech.phone,
       email: tech.email ?? "",
-      google_calendar_id: tech.google_calendar_id ?? "",
       calendar_provider: tech.calendar_provider ?? "none",
       specialties: tech.specialties ?? "",
       works_after_hours: tech.works_after_hours,
@@ -146,9 +144,16 @@ export default function TechniciansPage() {
               <option value="microsoft">Microsoft Outlook</option>
             </select>
             {form.calendar_provider === "google" && (
-              <input placeholder="Google Calendar ID (email)" value={form.google_calendar_id}
-                onChange={(e) => setForm({ ...form, google_calendar_id: e.target.value })}
-                className="col-span-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+              <div className="col-span-full">
+                <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-800">
+                  <p className="font-medium">Next step: Send setup link to the technician</p>
+                  <p className="mt-1">
+                    After saving, go to <span className="font-semibold">Settings → Google Calendar Sync</span> and click
+                    &quot;Send Setup Link&quot;. The technician will receive an SMS — they just tap the link,
+                    sign in to Google, and their calendar connects automatically.
+                  </p>
+                </div>
+              </div>
             )}
             {form.calendar_provider === "microsoft" && (
               <p className="col-span-full text-sm text-gray-500">
