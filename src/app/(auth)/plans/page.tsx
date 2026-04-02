@@ -52,12 +52,12 @@ export default function PlansPage() {
               key={key}
               className={`rounded-xl border-2 p-6 ${
                 key === "pro"
-                  ? "border-blue-600 ring-1 ring-blue-600"
+                  ? "border-[#3B6FFF] ring-1 ring-[#3B6FFF]"
                   : "border-gray-200"
               }`}
             >
               {key === "pro" && (
-                <span className="mb-3 inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                <span className="mb-3 inline-block rounded-full bg-[#3B6FFF]/10 px-2.5 py-0.5 text-xs font-semibold text-[#3B6FFF]">
                   Most Popular
                 </span>
               )}
@@ -78,7 +78,7 @@ export default function PlansPage() {
                 onClick={() => handleSelect(key)}
                 className={`mt-6 w-full rounded-lg py-2.5 text-sm font-medium ${
                   key === "pro"
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    ? "bg-[#3B6FFF] text-white hover:bg-[#2D5FE6]"
                     : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >

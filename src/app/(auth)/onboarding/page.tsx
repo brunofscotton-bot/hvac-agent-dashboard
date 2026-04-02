@@ -73,6 +73,7 @@ export default function OnboardingPage() {
     agent_name: "Ana",
     languages_supported: "en",
     greeting_message: "",
+    voice_gender: "female",
     area_code: "407",
   });
 
@@ -132,9 +133,9 @@ export default function OnboardingPage() {
         <h2 className="mt-4 text-xl font-bold">You&apos;re All Set!</h2>
         <p className="mt-2 text-gray-600">{result.message}</p>
         {result.phone_number && (
-          <div className="mt-6 rounded-lg bg-blue-50 p-4">
+          <div className="mt-6 rounded-lg bg-[#3B6FFF]/10 p-4">
             <p className="text-sm text-gray-600">Your AI agent phone number:</p>
-            <p className="mt-1 flex items-center justify-center gap-2 text-2xl font-bold text-blue-700">
+            <p className="mt-1 flex items-center justify-center gap-2 text-2xl font-bold text-[#3B6FFF]">
               <Phone className="h-6 w-6" />
               {result.phone_number}
             </p>
@@ -145,7 +146,7 @@ export default function OnboardingPage() {
         )}
         <button
           onClick={() => router.push("/")}
-          className="mt-6 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+          className="mt-6 rounded-lg bg-[#3B6FFF] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#2D5FE6]"
         >
           Go to Dashboard
         </button>
@@ -163,9 +164,9 @@ export default function OnboardingPage() {
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
                 i < step
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#3B6FFF] text-white"
                   : i === step
-                  ? "bg-blue-100 text-blue-700 ring-2 ring-blue-600"
+                  ? "bg-[#3B6FFF]/10 text-[#3B6FFF] ring-2 ring-[#3B6FFF]"
                   : "bg-gray-100 text-gray-400"
               }`}
             >
@@ -179,7 +180,7 @@ export default function OnboardingPage() {
               {s.label}
             </span>
             {i < steps.length - 1 && (
-              <div className={`mx-2 h-px w-8 ${i < step ? "bg-blue-600" : "bg-gray-200"}`} />
+              <div className={`mx-2 h-px w-8 ${i < step ? "bg-[#3B6FFF]" : "bg-gray-200"}`} />
             )}
           </div>
         ))}
@@ -466,6 +467,36 @@ export default function OnboardingPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
+                Agent Voice
+              </label>
+              <div className="mt-2 flex gap-3">
+                {[
+                  { value: "female", label: "Female" },
+                  { value: "male", label: "Male" },
+                ].map((opt) => {
+                  const active = form.voice_gender === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => updateForm("voice_gender", opt.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                        active
+                          ? "border-[#3B6FFF] bg-[#3B6FFF]/10 text-[#3B6FFF]"
+                          : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1 text-xs text-gray-400">
+                Choose the voice your AI agent will use on calls
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
                 Languages Supported
               </label>
               <div className="mt-2 flex gap-3">
@@ -482,7 +513,7 @@ export default function OnboardingPage() {
                       onClick={() => toggleLanguage(lang.code)}
                       className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                         active
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          ? "border-[#3B6FFF] bg-[#3B6FFF]/10 text-[#3B6FFF]"
                           : "border-gray-300 text-gray-600 hover:bg-gray-50"
                       }`}
                     >
@@ -564,17 +595,17 @@ export default function OnboardingPage() {
                   AI Agent
                 </h3>
                 <p className="mt-1 text-sm">
-                  Name: {form.agent_name} | Languages:{" "}
+                  Name: {form.agent_name} | Voice: {form.voice_gender === "male" ? "Male" : "Female"} | Languages:{" "}
                   {form.languages_supported.toUpperCase().replace(/,/g, ", ")}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">
+            <div className="rounded-lg border border-[#3B6FFF]/20 bg-[#3B6FFF]/10 p-4">
+              <p className="text-sm text-[#3B6FFF]">
                 Clicking &ldquo;Launch Agent&rdquo; will:
               </p>
-              <ul className="mt-2 space-y-1 text-sm text-blue-700">
+              <ul className="mt-2 space-y-1 text-sm text-[#3B6FFF]">
                 <li>1. Purchase a local phone number ({form.area_code})</li>
                 <li>2. Create your custom AI assistant</li>
                 <li>3. Connect the phone number to your agent</li>
@@ -596,7 +627,7 @@ export default function OnboardingPage() {
           {step < steps.length - 1 ? (
             <button
               onClick={() => setStep((s) => s + 1)}
-              className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
             >
               Continue
             </button>
@@ -604,7 +635,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
             >
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {submitting ? "Provisioning..." : "Launch Agent"}

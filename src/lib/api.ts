@@ -75,6 +75,21 @@ export const addTechnicianTimeOff = (id: string, data: Omit<TimeOffBlock, "id">)
 export const deleteTechnicianTimeOff = (techId: string, timeOffId: string) =>
   fetchAPI(`/technicians/${techId}/time-off/${timeOffId}`, { method: "DELETE" });
 
+// Customers
+export const getCustomers = (page = 1, search?: string) => {
+  const params = new URLSearchParams({ page: String(page), per_page: "20" });
+  if (search) params.set("search", search);
+  return fetchAPI<PaginatedResponse<CustomerInfo>>(`/customers?${params}`);
+};
+export const getCustomer = (id: string) => fetchAPI<CustomerDetail>(`/customers/${id}`);
+export const createCustomer = (data: Partial<CustomerInfo>) =>
+  fetchAPI<{ id: string; name: string }>("/customers", { method: "POST", body: JSON.stringify(data) });
+export const updateCustomer = (id: string, data: Partial<CustomerInfo>) =>
+  fetchAPI(`/customers/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+export const deleteCustomer = (id: string) =>
+  fetchAPI(`/customers/${id}`, { method: "DELETE" });
+export const getCustomerStats = () => fetchAPI<CustomerStats>("/customers/stats");
+
 // Onboarding
 export const completeOnboarding = (data: OnboardingData) =>
   fetchAPI<OnboardingResult>("/onboarding/complete", {
@@ -230,6 +245,7 @@ export interface OnboardingData {
   agent_name: string;
   languages_supported: string;
   greeting_message?: string;
+  voice_gender: string;
   area_code: string;
 }
 
@@ -267,4 +283,39 @@ export interface Invoice {
   created: number;
   invoice_pdf?: string;
   hosted_invoice_url?: string;
+}
+
+export interface CustomerInfo {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address: string;
+  city: string;
+  state: string;
+  language: string;
+  notes?: string;
+  appointment_count: number;
+  last_appointment_date?: string;
+  total_spent: number;
+  created_at: string;
+}
+
+export interface CustomerDetail extends CustomerInfo {
+  appointments: {
+    id: string;
+    scheduled_date: string;
+    status: string;
+    urgency: string;
+    problem_description: string;
+    visit_fee: number;
+    technician_id?: string;
+    created_at: string;
+  }[];
+}
+
+export interface CustomerStats {
+  total_customers: number;
+  new_this_month: number;
+  with_appointments_this_month: number;
 }

@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
+  UserCircle,
   DollarSign,
   Phone,
   Settings,
@@ -19,9 +20,10 @@ import {
 import { useAuth } from "@/lib/auth";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/home", label: "Dashboard", icon: LayoutDashboard },
   { href: "/appointments", label: "Appointments", icon: Calendar },
   { href: "/technicians", label: "Technicians", icon: Users },
+  { href: "/customers", label: "Customers", icon: UserCircle },
   { href: "/pricing", label: "Pricing", icon: DollarSign },
   { href: "/calls", label: "Call History", icon: Phone },
   { href: "/billing", label: "Billing", icon: CreditCard },
@@ -35,14 +37,14 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className="flex items-center gap-2 border-b border-gray-200 px-6 py-5">
-        <Snowflake className="h-7 w-7 text-blue-600" />
-        <span className="text-lg font-bold text-gray-900">HVAC Agent</span>
+        <Snowflake className="h-7 w-7 text-[#3B6FFF]" />
+        <span className="text-lg font-bold text-gray-900">Ringa</span>
       </div>
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href));
+            (item.href !== "/home" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
@@ -50,7 +52,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-blue-50 text-blue-700"
+                  ? "bg-[#3B6FFF]/10 text-[#3B6FFF]"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >

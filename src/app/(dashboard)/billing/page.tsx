@@ -20,7 +20,7 @@ import {
 
 const statusConfig: Record<string, { icon: any; color: string; label: string }> = {
   active: { icon: CheckCircle, color: "text-green-600 bg-green-50", label: "Active" },
-  trialing: { icon: CheckCircle, color: "text-blue-600 bg-blue-50", label: "Trial" },
+  trialing: { icon: CheckCircle, color: "text-[#3B6FFF] bg-[#3B6FFF]/10", label: "Trial" },
   past_due: { icon: AlertCircle, color: "text-orange-600 bg-orange-50", label: "Past Due" },
   canceled: { icon: XCircle, color: "text-red-600 bg-red-50", label: "Canceled" },
   none: { icon: XCircle, color: "text-gray-600 bg-gray-50", label: "No Subscription" },
@@ -121,13 +121,13 @@ export default function BillingPage() {
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => handleSubscribe("starter")}
-                  className="rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                  className="rounded-lg border border-[#3B6FFF] px-4 py-2 text-sm font-medium text-[#3B6FFF] hover:bg-[#3B6FFF]/10"
                 >
                   Starter — $99/mo
                 </button>
                 <button
                   onClick={() => handleSubscribe("pro")}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  className="rounded-lg bg-[#3B6FFF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
                 >
                   Pro — $299/mo
                 </button>
@@ -211,7 +211,7 @@ export default function BillingPage() {
                           href={inv.hosted_invoice_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:underline"
+                          className="flex items-center gap-1 text-[#3B6FFF] hover:underline"
                         >
                           <FileText className="h-3.5 w-3.5" /> View
                         </a>

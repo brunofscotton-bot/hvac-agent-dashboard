@@ -40,6 +40,7 @@ const TOKEN_KEY = "hvac_token";
 const API_BASE = "/api";
 
 const PUBLIC_PATHS = ["/login", "/signup"];
+const LANDING_PATH = "/";
 
 // ── Context ─────────────────────────────────────────────────────────────────
 
@@ -101,16 +102,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+    const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+    const isLanding = pathname === LANDING_PATH;
 
     if (!token && !isPublic) {
       router.replace("/login");
-    } else if (token && company && isPublic) {
+    } else if (token && company && isPublic && !isLanding) {
       // Logged in user on public page — redirect to dashboard
       if (!company.onboarding_completed) {
         router.replace("/onboarding");
       } else {
-        router.replace("/");
+        router.replace("/home");
       }
     }
   }, [loading, token, company, pathname, router]);
@@ -132,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (me && !me.onboarding_completed) {
       router.push("/onboarding");
     } else {
-      router.push("/");
+      router.push("/home");
     }
   };
 

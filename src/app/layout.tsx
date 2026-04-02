@@ -3,8 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "HVAC Agent Dashboard",
-  description: "Manage your HVAC service appointments, technicians, and calls",
+  title: "Ringa Dashboard",
+  description: "Manage your AI phone agent for HVAC service appointments, technicians, and calls",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

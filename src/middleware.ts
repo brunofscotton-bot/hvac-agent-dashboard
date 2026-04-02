@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/", "/login", "/signup"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
   // The primary auth check remains in the AuthProvider context.
   const token = request.cookies.get("hvac_token")?.value;
 
-  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  const isPublicPath = pathname === "/" || PUBLIC_PATHS.some((p) => p !== "/" && pathname.startsWith(p));
 
   if (!token && !isPublicPath) {
     // No token and trying to access protected page — redirect to login
