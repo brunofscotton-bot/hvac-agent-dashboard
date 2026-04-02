@@ -13,7 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getAdminCompanies, getAdminStats } from "@/lib/api";
+import { getAdminCompanies, getAdminStats, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
 import type { AdminCompany, AdminPlatformStats } from "@/lib/api";
 
 function StatCard({
@@ -66,6 +66,36 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete "${name}" and ALL its data? This also releases the Twilio number and deletes the Vapi assistant. This cannot be undone.`)) return;
+    setActionLoading(id);
+    try {
+      await deleteAdminCompany(id);
+      setCompanies((prev) => prev.filter((c) => c.id !== id));
+      // Refresh stats
+      const s = await getAdminStats();
+      setStats(s);
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleResetOnboarding = async (id: string, name: string) => {
+    if (!confirm(`Reset onboarding for "${name}"? They will see the setup wizard again on next login.`)) return;
+    setActionLoading(id);
+    try {
+      await resetAdminOnboarding(id);
+      setCompanies((prev) => prev.map((c) => c.id === id ? { ...c, onboarding_completed: false } : c));
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   useEffect(() => {
     Promise.all([getAdminCompanies(), getAdminStats()])
@@ -240,6 +270,24 @@ export default function AdminPage() {
                           <p className="text-xs font-medium text-gray-400 uppercase">Company ID</p>
                           <p className="mt-1 text-xs font-mono text-gray-400 break-all">{c.id}</p>
                         </div>
+                      </div>
+
+                      {/* Admin actions */}
+                      <div className="mt-4 flex items-center gap-3 border-t border-gray-200 pt-4">
+                        <button
+                          onClick={() => handleResetOnboarding(c.id, c.name)}
+                          disabled={actionLoading === c.id}
+                          className="rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-1.5 text-xs font-medium text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+                        >
+                          {actionLoading === c.id ? "..." : "Reset Onboarding"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(c.id, c.name)}
+                          disabled={actionLoading === c.id}
+                          className="rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+                        >
+                          {actionLoading === c.id ? "Deleting..." : "Delete Company"}
+                        </button>
                       </div>
                     </div>
                   )}

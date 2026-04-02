@@ -116,6 +116,10 @@ export const getInvoices = () => fetchAPI<{ invoices: Invoice[] }>("/billing/inv
 export const getAdminCompanies = () => fetchAPI<AdminCompany[]>("/admin/companies");
 export const getAdminStats = () => fetchAPI<AdminPlatformStats>("/admin/stats");
 export const getAdminCompanyDetail = (id: string) => fetchAPI<AdminCompanyDetail>(`/admin/companies/${id}`);
+export const deleteAdminCompany = (id: string) =>
+  fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}`, { method: "DELETE" });
+export const resetAdminOnboarding = (id: string) =>
+  fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
