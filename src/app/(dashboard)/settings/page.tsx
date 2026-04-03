@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Save, Building, Phone, Link2, Unlink, Calendar, Send } from "lucide-react";
-import { getCompany, updateCompany, getJobberStatus, disconnectJobber, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
+import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw } from "lucide-react";
+import { getCompany, updateCompany, getJobberStatus, disconnectJobber, syncJobberTechnicians, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
@@ -16,6 +16,8 @@ export default function SettingsPage() {
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [sendingSmsTo, setSendingSmsTo] = useState<string | null>(null);
   const [smsSent, setSmsSent] = useState<Set<string>>(new Set());
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const { token } = useAuth();
 
@@ -216,12 +218,36 @@ export default function SettingsPage() {
           <p className="mt-2 text-sm text-gray-500">
             Connect Jobber to automatically sync appointments, clients, and job details.
           </p>
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             {jobberConnected ? (
               <>
                 <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                   Connected
                 </span>
+                <button
+                  onClick={async () => {
+                    setSyncing(true);
+                    setSyncResult(null);
+                    try {
+                      const result = await syncJobberTechnicians();
+                      if (result.imported > 0) {
+                        setSyncResult(`Imported ${result.imported} technician${result.imported > 1 ? "s" : ""}`);
+                        getTechnicians().then(setTechnicians).catch(() => {});
+                      } else {
+                        setSyncResult("All technicians already synced");
+                      }
+                    } catch (e) {
+                      setSyncResult("Sync failed");
+                      console.error(e);
+                    }
+                    setSyncing(false);
+                  }}
+                  disabled={syncing}
+                  className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
+                  {syncing ? "Syncing..." : "Sync Technicians"}
+                </button>
                 <button
                   onClick={async () => {
                     setJobberLoading(true);
@@ -250,6 +276,14 @@ export default function SettingsPage() {
               </a>
             )}
           </div>
+          {syncResult && (
+            <p className="mt-2 text-xs text-green-600">{syncResult}</p>
+          )}
+          {searchParams.get("imported") && Number(searchParams.get("imported")) > 0 && (
+            <p className="mt-2 text-sm text-green-600">
+              {searchParams.get("imported")} technician{Number(searchParams.get("imported")) > 1 ? "s" : ""} imported from Jobber automatically!
+            </p>
+          )}
         </div>
 
         {/* Integration Status */}

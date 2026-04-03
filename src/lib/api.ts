@@ -130,6 +130,8 @@ export const sendCalendarInstructions = (techId: string) =>
 export const getJobberStatus = () => fetchAPI<{ connected: boolean }>("/integrations/jobber/status");
 export const disconnectJobber = () =>
   fetchAPI<{ success: boolean; message: string }>("/integrations/jobber/disconnect", { method: "POST" });
+export const syncJobberTechnicians = () =>
+  fetchAPI<{ success: boolean; imported: number; skipped: number; total_found: number }>("/integrations/jobber/sync-technicians", { method: "POST" });
 
 // ── Types ───────────────────────────────────────────────────────────────────
 

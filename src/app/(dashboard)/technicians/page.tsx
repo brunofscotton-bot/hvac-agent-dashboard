@@ -11,6 +11,8 @@ import {
   Save,
   ChevronDown,
   ChevronUp,
+  Link2,
+  RefreshCw,
 } from "lucide-react";
 import {
   getTechnicians,
@@ -22,10 +24,13 @@ import {
   getTechnicianTimeOff,
   addTechnicianTimeOff,
   deleteTechnicianTimeOff,
+  getJobberStatus,
+  syncJobberTechnicians,
   type Technician,
   type WorkingHoursDay,
   type TimeOffBlock,
 } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -43,6 +48,10 @@ export default function TechniciansPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [jobberConnected, setJobberConnected] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
+  const { token } = useAuth();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -63,6 +72,9 @@ export default function TechniciansPage() {
 
   useEffect(() => {
     loadTechnicians();
+    getJobberStatus()
+      .then((s) => setJobberConnected(s.connected))
+      .catch(() => {});
   }, []);
 
   const resetForm = () => {
@@ -121,6 +133,62 @@ export default function TechniciansPage() {
           <Plus className="h-4 w-4" /> Add Technician
         </button>
       </div>
+
+      {/* Jobber Import Banner */}
+      {!loading && (
+        <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-green-800">
+                {jobberConnected
+                  ? "Jobber is connected — sync your technicians automatically"
+                  : "Use Jobber? Connect it to import your active technicians automatically"}
+              </p>
+              <p className="mt-0.5 text-xs text-green-600">
+                {jobberConnected
+                  ? "Click \"Sync from Jobber\" to import any new team members."
+                  : "No need to add technicians manually — we'll pull them from your Jobber account."}
+              </p>
+            </div>
+            {jobberConnected ? (
+              <button
+                onClick={async () => {
+                  setSyncing(true);
+                  setSyncResult(null);
+                  try {
+                    const result = await syncJobberTechnicians();
+                    if (result.imported > 0) {
+                      setSyncResult(`Imported ${result.imported} technician${result.imported > 1 ? "s" : ""}!`);
+                      loadTechnicians();
+                    } else {
+                      setSyncResult("All technicians already synced");
+                    }
+                  } catch {
+                    setSyncResult("Sync failed — try again");
+                  }
+                  setSyncing(false);
+                }}
+                disabled={syncing}
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+                {syncing ? "Syncing..." : "Sync from Jobber"}
+              </button>
+            ) : (
+              <a
+                href={`/api/integrations/jobber/connect?token=${token}`}
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+              >
+                <Link2 className="h-4 w-4" />
+                Connect Jobber
+              </a>
+            )}
+          </div>
+          {syncResult && (
+            <p className="mt-2 text-xs font-medium text-green-700">{syncResult}</p>
+          )}
+        </div>
+      )}
 
       {/* Create/Edit Form */}
       {showForm && (
