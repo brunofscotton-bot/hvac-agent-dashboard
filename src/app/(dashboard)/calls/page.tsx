@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, Clock, Globe } from "lucide-react";
+import { Phone, Clock, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import { getRecentCalls, type CallLog } from "@/lib/api";
 
 const outcomeColors: Record<string, string> = {
@@ -30,9 +30,33 @@ const langLabels: Record<string, string> = {
   es: "Spanish",
 };
 
+function TranscriptLine({ line }: { line: string }) {
+  const isCustomer = line.startsWith("Customer:");
+  const isAgent = line.startsWith("Agent:");
+
+  if (isCustomer) {
+    return (
+      <p className="py-0.5">
+        <span className="font-medium text-blue-600">Customer:</span>
+        <span className="text-gray-700">{line.slice("Customer:".length)}</span>
+      </p>
+    );
+  }
+  if (isAgent) {
+    return (
+      <p className="py-0.5">
+        <span className="font-medium text-gray-500">Agent:</span>
+        <span className="text-gray-700">{line.slice("Agent:".length)}</span>
+      </p>
+    );
+  }
+  return <p className="py-0.5 text-gray-700">{line}</p>;
+}
+
 export default function CallsPage() {
   const [calls, setCalls] = useState<CallLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     getRecentCalls(50)
@@ -42,10 +66,14 @@ export default function CallsPage() {
   }, []);
 
   const formatDuration = (seconds?: number) => {
-    if (!seconds) return "—";
+    if (!seconds) return "\u2014";
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -63,62 +91,98 @@ export default function CallsPage() {
               <th className="px-4 py-3 font-medium text-gray-600">Language</th>
               <th className="px-4 py-3 font-medium text-gray-600">Outcome</th>
               <th className="px-4 py-3 font-medium text-gray-600">Summary</th>
+              <th className="w-10 px-2 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td>
               </tr>
             ) : calls.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                   No calls recorded yet. Calls will appear here once the AI agent starts handling phone calls.
                 </td>
               </tr>
             ) : (
-              calls.map((call) => (
-                <tr key={call.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-4 py-3">
-                    {new Date(call.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3.5 w-3.5 text-gray-400" />
-                      {call.caller_phone ?? "Unknown"}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5 text-gray-400" />
-                      {formatDuration(call.duration_seconds)}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <Globe className="h-3.5 w-3.5 text-gray-400" />
-                      {langLabels[call.language_detected ?? ""] ?? call.language_detected ?? "—"}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {call.outcome ? (
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${outcomeColors[call.outcome] ?? ""}`}>
-                        {outcomeLabels[call.outcome] ?? call.outcome}
-                      </span>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="max-w-[300px] truncate px-4 py-3 text-gray-600">
-                    {call.summary ?? "—"}
-                  </td>
-                </tr>
-              ))
+              calls.map((call) => {
+                const isExpanded = expandedId === call.id;
+                return (
+                  <tr key={call.id} className="group">
+                    <td colSpan={7} className="p-0">
+                      <div
+                        className="flex cursor-pointer items-center hover:bg-gray-50"
+                        onClick={() => toggleExpand(call.id)}
+                      >
+                        <div className="whitespace-nowrap px-4 py-3 flex-shrink-0" style={{ width: "140px" }}>
+                          {new Date(call.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </div>
+                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "140px" }}>
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-3.5 w-3.5 text-gray-400" />
+                            {call.caller_phone ?? "Unknown"}
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "90px" }}>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-gray-400" />
+                            {formatDuration(call.duration_seconds)}
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "110px" }}>
+                          <div className="flex items-center gap-1">
+                            <Globe className="h-3.5 w-3.5 text-gray-400" />
+                            {langLabels[call.language_detected ?? ""] ?? call.language_detected ?? "\u2014"}
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "100px" }}>
+                          {call.outcome ? (
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${outcomeColors[call.outcome] ?? ""}`}>
+                              {outcomeLabels[call.outcome] ?? call.outcome}
+                            </span>
+                          ) : (
+                            "\u2014"
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1 px-4 py-3 text-gray-600 truncate">
+                          {call.summary ?? "\u2014"}
+                        </div>
+                        <div className="px-2 py-3 flex-shrink-0">
+                          {isExpanded ? (
+                            <ChevronUp className="h-4 w-4 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-medium text-gray-700">Transcript</h4>
+                            <span className="text-xs text-gray-400">Transcript expires after 15 days</span>
+                          </div>
+                          {call.transcript ? (
+                            <div className="max-h-80 overflow-y-auto rounded-md bg-white border border-gray-200 p-4 text-sm leading-relaxed">
+                              {call.transcript.split("\n").map((line, i) => (
+                                <TranscriptLine key={i} line={line} />
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-400 italic">No transcript available</p>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

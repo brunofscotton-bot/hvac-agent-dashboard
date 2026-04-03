@@ -48,6 +48,13 @@ const emptyTech: TechForm = {
   works_weekends: false,
 };
 
+const US_STATES = [
+  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
+  "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+  "VA","WA","WV","WI","WY","DC",
+];
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
@@ -74,7 +81,6 @@ export default function OnboardingPage() {
     languages_supported: "en",
     greeting_message: "",
     voice_gender: "female",
-    area_code: "407",
   });
 
   const [technicians, setTechnicians] = useState<TechForm[]>([{ ...emptyTech }]);
@@ -382,26 +388,14 @@ export default function OnboardingPage() {
                 placeholder="Your HVAC Company"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <input
-                  value={form.phone}
-                  onChange={(e) => updateForm("phone", e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  placeholder="+1 (407) 555-1234"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Area Code for AI Number</label>
-                <input
-                  value={form.area_code}
-                  onChange={(e) => updateForm("area_code", e.target.value)}
-                  maxLength={3}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  placeholder="407"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                value={form.phone}
+                onChange={(e) => updateForm("phone", e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                placeholder="+1 (407) 555-1234"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Address</label>
@@ -420,18 +414,25 @@ export default function OnboardingPage() {
                   value={form.city}
                   onChange={(e) => updateForm("city", e.target.value)}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  placeholder="Orlando"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">State</label>
-                <input
+                <select
                   value={form.state}
                   onChange={(e) => updateForm("state", e.target.value)}
-                  maxLength={2}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
+                >
+                  {US_STATES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
             </div>
+            <p className="text-xs text-gray-400">
+              Your AI phone number will be a local number for {form.city || "your city"}, {form.state || "your state"}.
+            </p>
           </div>
         )}
 
@@ -768,7 +769,7 @@ export default function OnboardingPage() {
                 <h3 className="text-sm font-semibold text-gray-700">Company</h3>
                 <p className="mt-1 text-sm">{form.company_name}</p>
                 <p className="text-xs text-gray-500">
-                  {form.city}, {form.state} | Area code: {form.area_code}
+                  {form.city}, {form.state} — local number will be purchased
                 </p>
               </div>
 
@@ -817,7 +818,7 @@ export default function OnboardingPage() {
                 Clicking &ldquo;Launch Agent&rdquo; will:
               </p>
               <ul className="mt-2 space-y-1 text-sm text-[#3B6FFF]">
-                <li>1. Purchase a local phone number ({form.area_code})</li>
+                <li>1. Purchase a local phone number for {form.city}, {form.state}</li>
                 <li>2. Create your custom AI assistant</li>
                 <li>3. Connect the phone number to your agent</li>
               </ul>

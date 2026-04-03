@@ -13,7 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getAdminCompanies, getAdminStats, getAdminCosts, getAdminTickets, updateAdminTicket, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
+import { getAdminCompanies, getAdminStats, getAdminCosts, getAdminTickets, updateAdminTicket, deleteAdminCompany, resetAdminOnboarding, deployAssistantAll } from "@/lib/api";
 import type { AdminCompany, AdminPlatformStats, AdminInfraCosts, AdminTicket } from "@/lib/api";
 
 const API_BASE = "/api";
@@ -78,6 +78,8 @@ export default function AdminPage() {
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [deployLoading, setDeployLoading] = useState(false);
+  const [deployResult, setDeployResult] = useState<{ updated: number; failed: number; errors: string[] } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     twilio_phone_number: "",
@@ -178,6 +180,20 @@ export default function AdminPage() {
       console.error(err);
     } finally {
       setTicketsLoading(false);
+    }
+  };
+
+  const handleDeployAll = async () => {
+    if (!confirm("Deploy the latest assistant config (prompt, tools, voice) to ALL companies?")) return;
+    setDeployLoading(true);
+    setDeployResult(null);
+    try {
+      const result = await deployAssistantAll();
+      setDeployResult(result);
+    } catch (err: any) {
+      alert("Deploy failed: " + err.message);
+    } finally {
+      setDeployLoading(false);
     }
   };
 
@@ -416,6 +432,47 @@ export default function AdminPage() {
 
       {/* Companies table */}
       {tab === "overview" && (
+      <>
+      {/* Deploy Assistant Update */}
+      <div className="mb-6 rounded-xl border border-gray-200 bg-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900">Deploy Assistant Update</h3>
+            <p className="text-sm text-gray-500">Push the latest prompt, tools, and voice config to all Vapi assistants.</p>
+          </div>
+          <button
+            onClick={handleDeployAll}
+            disabled={deployLoading}
+            className="rounded-lg bg-[#3B6FFF] px-5 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
+          >
+            {deployLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Deploying...
+              </span>
+            ) : (
+              "Deploy to All Companies"
+            )}
+          </button>
+        </div>
+        {deployResult && (
+          <div className={`mt-3 rounded-lg px-4 py-3 text-sm ${
+            deployResult.failed === 0 ? "bg-green-50 text-green-700" : "bg-yellow-50 text-yellow-700"
+          }`}>
+            <p className="font-medium">
+              {deployResult.updated} updated, {deployResult.failed} failed
+            </p>
+            {deployResult.errors.length > 0 && (
+              <ul className="mt-1 list-disc pl-5 text-xs">
+                {deployResult.errors.map((e, i) => (
+                  <li key={i}>{e}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="rounded-xl border border-gray-200 bg-white">
         <div className="border-b border-gray-200 px-6 py-4">
           <h2 className="font-semibold text-gray-900">
@@ -624,6 +681,7 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+      </>
       )}
     </div>
   );

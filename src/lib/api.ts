@@ -34,6 +34,7 @@ async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
 // Dashboard
 export const getDashboardStats = () => fetchAPI<DashboardStats>("/dashboard/stats");
 export const getRecentCalls = (limit = 20) => fetchAPI<CallLog[]>(`/dashboard/calls?limit=${limit}`);
+export const getCallDetail = (id: string) => fetchAPI<CallLog>(`/dashboard/calls/${id}`);
 
 // Appointments
 export const getAppointments = (params?: string) =>
@@ -121,6 +122,10 @@ export const deleteAdminCompany = (id: string) =>
 export const resetAdminOnboarding = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
 export const getAdminCosts = () => fetchAPI<AdminInfraCosts>("/admin/costs");
+export const deployAssistantAll = () =>
+  fetchAPI<{ updated: number; failed: number; errors: string[] }>("/admin/deploy-assistant", { method: "POST" });
+export const deployAssistantCompany = (id: string) =>
+  fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/deploy-assistant`, { method: "POST" });
 
 // Support Tickets
 export const createSupportTicket = (data: { subject: string; message: string; category?: string }) =>
@@ -142,6 +147,8 @@ export const disconnectJobber = () =>
   fetchAPI<{ success: boolean; message: string }>("/integrations/jobber/disconnect", { method: "POST" });
 export const syncJobberTechnicians = () =>
   fetchAPI<{ success: boolean; imported: number; skipped: number; total_found: number }>("/integrations/jobber/sync-technicians", { method: "POST" });
+export const syncJobberSchedules = () =>
+  fetchAPI<{ success: boolean; updated: number; message: string }>("/integrations/jobber/sync-schedules", { method: "POST" });
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -234,6 +241,7 @@ export interface Company {
   fee_applies_to_service: boolean;
   business_hours_start: number;
   business_hours_end: number;
+  call_escalation_enabled?: boolean;
 }
 
 export interface CallLog {
@@ -243,6 +251,7 @@ export interface CallLog {
   language_detected?: string;
   outcome?: string;
   summary?: string;
+  transcript?: string;
   created_at: string;
 }
 
@@ -257,8 +266,8 @@ export interface OnboardingData {
   company_name: string;
   phone?: string;
   address?: string;
-  city?: string;
-  state?: string;
+  city: string;
+  state: string;
   service_fee: number;
   after_hours_fee: number;
   fee_applies_to_service: boolean;
@@ -277,7 +286,6 @@ export interface OnboardingData {
   languages_supported: string;
   greeting_message?: string;
   voice_gender: string;
-  area_code: string;
   send_calendar_sms?: boolean;
 }
 

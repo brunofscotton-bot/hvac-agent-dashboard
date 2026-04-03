@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw } from "lucide-react";
-import { getCompany, updateCompany, getJobberStatus, disconnectJobber, syncJobberTechnicians, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
+import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw, PhoneForwarded } from "lucide-react";
+import { getCompany, updateCompany, getJobberStatus, disconnectJobber, syncJobberTechnicians, syncJobberSchedules, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 export default function SettingsPage() {
@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const [smsSent, setSmsSent] = useState<Set<string>>(new Set());
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [syncingSchedules, setSyncingSchedules] = useState(false);
+  const [scheduleSyncResult, setScheduleSyncResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const { token } = useAuth();
 
@@ -53,6 +55,7 @@ export default function SettingsPage() {
       phone: company.phone,
       address: company.address,
       twilio_phone_number: company.twilio_phone_number,
+      call_escalation_enabled: company.call_escalation_enabled,
     });
     setSaving(false);
     setSaved(true);
@@ -250,6 +253,29 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={async () => {
+                    setSyncingSchedules(true);
+                    setScheduleSyncResult(null);
+                    try {
+                      const result = await syncJobberSchedules();
+                      if (result.updated > 0) {
+                        setScheduleSyncResult(`Updated schedules for ${result.updated} technician${result.updated > 1 ? "s" : ""}`);
+                      } else {
+                        setScheduleSyncResult("No schedule changes found");
+                      }
+                    } catch (e) {
+                      setScheduleSyncResult("Schedule sync failed");
+                      console.error(e);
+                    }
+                    setSyncingSchedules(false);
+                  }}
+                  disabled={syncingSchedules}
+                  className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <Calendar className={`h-3.5 w-3.5 ${syncingSchedules ? "animate-spin" : ""}`} />
+                  {syncingSchedules ? "Syncing..." : "Sync Schedules"}
+                </button>
+                <button
+                  onClick={async () => {
                     setJobberLoading(true);
                     try {
                       await disconnectJobber();
@@ -279,11 +305,46 @@ export default function SettingsPage() {
           {syncResult && (
             <p className="mt-2 text-xs text-green-600">{syncResult}</p>
           )}
+          {scheduleSyncResult && (
+            <p className="mt-2 text-xs text-green-600">{scheduleSyncResult}</p>
+          )}
           {searchParams.get("imported") && Number(searchParams.get("imported")) > 0 && (
             <p className="mt-2 text-sm text-green-600">
               {searchParams.get("imported")} technician{Number(searchParams.get("imported")) > 1 ? "s" : ""} imported from Jobber automatically!
             </p>
           )}
+        </div>
+
+        {/* Call Escalation */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <PhoneForwarded className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Call Escalation</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Allow the AI agent to transfer calls to a live technician when the customer requests to speak with a real person.
+          </p>
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              onClick={() => setCompany({ ...company, call_escalation_enabled: !company.call_escalation_enabled })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                company.call_escalation_enabled ? "bg-blue-600" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  company.call_escalation_enabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+            <span className="text-sm text-gray-700">
+              {company.call_escalation_enabled ? "Enabled" : "Disabled"}
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-gray-400">
+            When enabled, customers can say &quot;speak to someone&quot; / &quot;falar com alguém&quot; / &quot;hablar con alguien&quot; to be transferred to an available technician.
+            Changes take effect after saving and will update your AI assistant.
+          </p>
         </div>
 
         {/* Integration Status */}
