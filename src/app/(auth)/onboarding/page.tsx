@@ -13,10 +13,9 @@ import {
   Loader2,
   Phone,
   Link2,
-  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { completeOnboarding, getJobberStatus, syncJobberTechnicians, type OnboardingData } from "@/lib/api";
+import { completeOnboarding, type OnboardingData } from "@/lib/api";
 
 // ── Step definitions ────────────────────────────────────────────────────────
 
@@ -51,7 +50,7 @@ const emptyTech: TechForm = {
 // ── Main component ──────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const { company, refresh, token } = useAuth();
+  const { company, refresh } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -79,36 +78,6 @@ export default function OnboardingPage() {
 
   const [technicians, setTechnicians] = useState<TechForm[]>([{ ...emptyTech }]);
   const [sendCalendarSms, setSendCalendarSms] = useState(true);
-  const [jobberConnected, setJobberConnected] = useState(false);
-  const [jobberSyncing, setJobberSyncing] = useState(false);
-  const [jobberResult, setJobberResult] = useState<string | null>(null);
-
-  // Check Jobber status (and handle return from Jobber OAuth)
-  useState(() => {
-    getJobberStatus()
-      .then((s) => setJobberConnected(s.connected))
-      .catch(() => {});
-  });
-
-  const handleJobberSync = async () => {
-    setJobberSyncing(true);
-    setJobberResult(null);
-    try {
-      const result = await syncJobberTechnicians();
-      if (result.imported > 0) {
-        // Replace the default empty tech form with a message
-        setTechnicians([]);
-        setJobberResult(`Imported ${result.imported} technician${result.imported > 1 ? "s" : ""} from Jobber!`);
-      } else if (result.total_found > 0) {
-        setJobberResult("All technicians already imported");
-      } else {
-        setJobberResult("No active team members found in Jobber");
-      }
-    } catch {
-      setJobberResult("Sync failed — you can add technicians manually below");
-    }
-    setJobberSyncing(false);
-  };
 
   const updateForm = (key: string, value: any) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -507,51 +476,22 @@ export default function OnboardingPage() {
           <div className="space-y-4">
             <h2 className="text-lg font-bold">Technicians</h2>
 
-            {/* Jobber Import Banner */}
-            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-800">
-                    {jobberConnected
-                      ? "Jobber connected! Import your technicians automatically."
-                      : "Use Jobber? Import your technicians automatically"}
-                  </p>
-                  <p className="mt-0.5 text-xs text-green-600">
-                    {jobberConnected
-                      ? "Click \"Import from Jobber\" to pull your active team members."
-                      : "Connect your Jobber account and we'll import your active team members — no manual entry needed."}
-                  </p>
-                </div>
-                {jobberConnected ? (
-                  <button
-                    onClick={handleJobberSync}
-                    disabled={jobberSyncing}
-                    className="flex shrink-0 items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                  >
-                    <RefreshCw className={`h-4 w-4 ${jobberSyncing ? "animate-spin" : ""}`} />
-                    {jobberSyncing ? "Importing..." : "Import from Jobber"}
-                  </button>
-                ) : (
-                  <a
-                    href={`/api/integrations/jobber/connect?token=${token}`}
-                    className="flex shrink-0 items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-                  >
-                    <Link2 className="h-4 w-4" />
-                    Connect Jobber
-                  </a>
-                )}
+            {/* Jobber tip */}
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+              <div className="flex items-start gap-2">
+                <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                <p className="text-sm text-green-800">
+                  <span className="font-medium">Use Jobber?</span> After setup, go to{" "}
+                  <span className="font-semibold">Settings → Jobber Integration</span> or{" "}
+                  <span className="font-semibold">Technicians</span> to connect Jobber and import your team members automatically.
+                </p>
               </div>
-              {jobberResult && (
-                <p className="mt-2 text-xs font-medium text-green-700">{jobberResult}</p>
-              )}
             </div>
 
-            {/* Manual add section */}
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">
-                {jobberConnected && jobberResult
-                  ? "You can also add technicians manually below."
-                  : "Or add your technicians manually. Calendar sync is optional — you can set their working hours after onboarding."}
+                Add at least one technician. Calendar sync is optional — you can set
+                their working hours after onboarding.
               </p>
               <button
                 onClick={addTechnician}
@@ -796,27 +736,16 @@ export default function OnboardingPage() {
 
               <div className="rounded-lg bg-gray-50 p-4">
                 <h3 className="text-sm font-semibold text-gray-700">
-                  Technicians
-                  {technicians.filter((t) => t.name).length > 0
-                    ? ` (${technicians.filter((t) => t.name).length})`
-                    : jobberResult
-                    ? " (imported from Jobber)"
-                    : ""}
+                  Technicians ({technicians.filter((t) => t.name).length})
                 </h3>
-                {technicians.filter((t) => t.name).length > 0 ? (
-                  technicians
-                    .filter((t) => t.name)
-                    .map((t, i) => (
-                      <p key={i} className="mt-1 text-sm">
-                        {t.name} — {t.phone}
-                        {t.calendar_provider === "google" && " (Google Calendar)"}
-                      </p>
-                    ))
-                ) : jobberResult ? (
-                  <p className="mt-1 text-sm text-green-600">{jobberResult}</p>
-                ) : (
-                  <p className="mt-1 text-sm text-gray-400">No technicians added — you can add them later</p>
-                )}
+                {technicians
+                  .filter((t) => t.name)
+                  .map((t, i) => (
+                    <p key={i} className="mt-1 text-sm">
+                      {t.name} — {t.phone}
+                      {t.calendar_provider === "google" && " (Google Calendar)"}
+                    </p>
+                  ))}
               </div>
 
               <div className="rounded-lg bg-gray-50 p-4">

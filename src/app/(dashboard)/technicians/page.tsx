@@ -163,8 +163,8 @@ export default function TechniciansPage() {
                     } else {
                       setSyncResult("All technicians already synced");
                     }
-                  } catch {
-                    setSyncResult("Sync failed — try again");
+                  } catch (e: any) {
+                    setSyncResult(e?.message || "Sync failed — try disconnecting and reconnecting Jobber in Settings");
                   }
                   setSyncing(false);
                 }}
@@ -185,7 +185,7 @@ export default function TechniciansPage() {
             )}
           </div>
           {syncResult && (
-            <p className="mt-2 text-xs font-medium text-green-700">{syncResult}</p>
+            <p className={`mt-2 text-xs font-medium ${syncResult.includes("failed") || syncResult.includes("disconnect") ? "text-red-600" : "text-green-700"}`}>{syncResult}</p>
           )}
         </div>
       )}
