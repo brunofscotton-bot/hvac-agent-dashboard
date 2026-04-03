@@ -122,6 +122,16 @@ export const resetAdminOnboarding = (id: string) =>
   fetchAPI<{ success: boolean; message: string }>(`/admin/companies/${id}/reset-onboarding`, { method: "POST" });
 export const getAdminCosts = () => fetchAPI<AdminInfraCosts>("/admin/costs");
 
+// Support Tickets
+export const createSupportTicket = (data: { subject: string; message: string; category?: string }) =>
+  fetchAPI<{ id: string; message: string }>("/support/tickets", { method: "POST", body: JSON.stringify(data) });
+export const getSupportTickets = () => fetchAPI<SupportTicket[]>("/support/tickets");
+
+// Admin - Support Tickets
+export const getAdminTickets = () => fetchAPI<AdminTicket[]>("/admin/tickets");
+export const updateAdminTicket = (id: string, data: { status?: string; admin_notes?: string }) =>
+  fetchAPI(`/admin/tickets/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+
 // Google Calendar
 export const sendCalendarInstructions = (techId: string) =>
   fetchAPI<{ success: boolean; message_sid: string }>(`/technicians/${techId}/send-calendar-instructions`, { method: "POST" });
@@ -393,6 +403,21 @@ export interface AdminCompanyCost {
   phone_number: string;
   call_count: number;
   estimated_cost: number;
+}
+
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  message: string;
+  category: string;
+  status: string;
+  created_at: string;
+}
+
+export interface AdminTicket extends SupportTicket {
+  company_name: string;
+  company_email: string;
+  admin_notes?: string;
 }
 
 export interface AdminInfraCosts {

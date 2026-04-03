@@ -13,9 +13,10 @@ import {
   Loader2,
   Phone,
   Link2,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { completeOnboarding, type OnboardingData } from "@/lib/api";
+import { completeOnboarding, createSupportTicket, type OnboardingData } from "@/lib/api";
 
 // ── Step definitions ────────────────────────────────────────────────────────
 
@@ -124,8 +125,16 @@ export default function OnboardingPage() {
     }
   };
 
+  // ── Support ticket state ────────────────────────────────────────────
+  const [showTicketForm, setShowTicketForm] = useState(false);
+  const [ticketMessage, setTicketMessage] = useState("");
+  const [ticketSubmitting, setTicketSubmitting] = useState(false);
+  const [ticketSent, setTicketSent] = useState(false);
+
   // ── Success screen with setup guide ──────────────────────────────────
   if (result) {
+    const phoneClean = result.phone_number?.replace("+1", "") || "";
+
     return (
       <div className="max-w-2xl space-y-6">
         {/* Header */}
@@ -146,7 +155,7 @@ export default function OnboardingPage() {
           )}
         </div>
 
-        {/* Step 1: Forward Calls */}
+        {/* Step 1: Forward Calls — codes first */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-start gap-4">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
@@ -155,66 +164,50 @@ export default function OnboardingPage() {
             <div className="flex-1">
               <h3 className="text-lg font-bold">Forward Your Business Calls</h3>
               <p className="mt-1 text-sm text-gray-600">
-                Set up call forwarding on your existing business number so unanswered calls go to Ringa.
-                Your customers keep calling the same number they always have.
+                Set up call forwarding so unanswered calls go to Ringa.
+                Pick your carrier and dial the code below:
               </p>
 
-              <div className="mt-4 rounded-lg bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-gray-700">How to set it up:</p>
-                <ol className="mt-2 space-y-2 text-sm text-gray-600">
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">1.</span>
-                    Call your phone carrier (AT&T, Verizon, T-Mobile, etc.)
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">2.</span>
-                    Ask for &ldquo;Conditional Call Forwarding&rdquo; (forwards when you don&apos;t answer)
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">3.</span>
-                    Forward to: <span className="font-mono font-semibold text-[#3B6FFF]">{result.phone_number}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="font-medium text-gray-800">4.</span>
-                    Set the ring time before forwarding (see guide below)
-                  </li>
-                </ol>
+              {/* Carrier codes — prominent and first */}
+              <div className="mt-4 space-y-3">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <p className="text-sm font-semibold text-gray-800">AT&T / T-Mobile</p>
+                  <p className="mt-1 font-mono text-lg font-bold text-[#3B6FFF]">*61*1{phoneClean}*11*10#</p>
+                  <p className="mt-1 text-xs text-gray-500">Dial this code and press Call</p>
+                </div>
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <p className="text-sm font-semibold text-gray-800">Verizon</p>
+                  <p className="mt-1 font-mono text-lg font-bold text-[#3B6FFF]">*71{phoneClean}</p>
+                  <p className="mt-1 text-xs text-gray-500">Dial this code and press Call</p>
+                </div>
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <p className="text-sm font-semibold text-gray-800">Landline / VoIP</p>
+                  <p className="mt-1 text-sm text-gray-700">
+                    Contact your provider and ask to forward unanswered calls to{" "}
+                    <span className="font-mono font-semibold text-[#3B6FFF]">{result.phone_number}</span>
+                  </p>
+                </div>
               </div>
 
+              {/* Ring time guide */}
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm font-semibold text-amber-800">Ring Time Guide</p>
                 <p className="mt-1 text-xs text-amber-700">
-                  Choose how long your phone rings before Ringa picks up:
+                  The codes above use 10-second forwarding (~2-3 rings). This is recommended so Ringa picks up quickly.
                 </p>
                 <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
                   <div className="rounded-lg bg-white p-2 shadow-sm">
                     <p className="text-lg font-bold text-amber-800">5s</p>
                     <p className="text-amber-600">~1 ring</p>
-                    <p className="text-gray-500">Ringa answers fast</p>
                   </div>
                   <div className="rounded-lg bg-white p-2 shadow-sm ring-2 ring-amber-400">
                     <p className="text-lg font-bold text-amber-800">10s</p>
-                    <p className="text-amber-600">~2-3 rings</p>
-                    <p className="text-gray-500">Recommended</p>
+                    <p className="text-amber-600">Recommended</p>
                   </div>
                   <div className="rounded-lg bg-white p-2 shadow-sm">
                     <p className="text-lg font-bold text-amber-800">15s</p>
                     <p className="text-amber-600">~4 rings</p>
-                    <p className="text-gray-500">Time to pick up first</p>
                   </div>
-                </div>
-                <p className="mt-2 text-xs text-amber-600">
-                  Most carriers use: <span className="font-mono">*61*{result.phone_number}*11*10#</span> to set 10-second forwarding.
-                  Check with your carrier for the exact code.
-                </p>
-              </div>
-
-              <div className="mt-4 rounded-lg bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-gray-700">Quick codes by carrier:</p>
-                <div className="mt-2 space-y-1 text-xs text-gray-600">
-                  <p><span className="font-medium">AT&T / T-Mobile:</span> Dial <span className="font-mono">*61*1{result.phone_number?.replace("+1", "")}*11*10#</span> then press Call</p>
-                  <p><span className="font-medium">Verizon:</span> Dial <span className="font-mono">*71{result.phone_number?.replace("+1", "")}</span> then press Call</p>
-                  <p><span className="font-medium">Landline / VoIP:</span> Contact your provider and ask to forward unanswered calls to {result.phone_number}</p>
                 </div>
               </div>
             </div>
@@ -255,13 +248,73 @@ export default function OnboardingPage() {
                     send setup links to your technicians.
                   </p>
                 )}
-                <p className="mt-3 text-xs text-gray-500">
-                  You can check the connection status anytime in Settings → Google Calendar Sync.
-                </p>
               </div>
             </div>
           </div>
         )}
+
+        {/* Need Help / Support */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-700">Need help with call forwarding?</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            If the codes above don&apos;t work, contact your phone carrier and ask for
+            &ldquo;Conditional Call Forwarding&rdquo; to <span className="font-mono font-medium">{result.phone_number}</span>.
+            If the problem persists, open a support ticket and our team will help you.
+          </p>
+
+          {ticketSent ? (
+            <div className="mt-3 rounded-lg border border-green-200 bg-green-50 p-3">
+              <p className="text-sm font-medium text-green-700">Ticket submitted! We&apos;ll get back to you soon.</p>
+            </div>
+          ) : showTicketForm ? (
+            <div className="mt-3 space-y-2">
+              <textarea
+                value={ticketMessage}
+                onChange={(e) => setTicketMessage(e.target.value)}
+                rows={3}
+                placeholder="Describe your issue..."
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    if (!ticketMessage.trim()) return;
+                    setTicketSubmitting(true);
+                    try {
+                      await createSupportTicket({
+                        subject: "Call forwarding setup help",
+                        message: ticketMessage,
+                        category: "call_forwarding",
+                      });
+                      setTicketSent(true);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    setTicketSubmitting(false);
+                  }}
+                  disabled={ticketSubmitting || !ticketMessage.trim()}
+                  className="rounded-lg bg-[#3B6FFF] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
+                >
+                  {ticketSubmitting ? "Submitting..." : "Submit Ticket"}
+                </button>
+                <button
+                  onClick={() => setShowTicketForm(false)}
+                  className="rounded-lg border border-gray-300 px-4 py-1.5 text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowTicketForm(true)}
+              className="mt-3 flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Open Support Ticket
+            </button>
+          )}
+        </div>
 
         {/* Go to Dashboard */}
         <div className="text-center">

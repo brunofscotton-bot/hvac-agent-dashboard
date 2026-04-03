@@ -13,8 +13,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getAdminCompanies, getAdminStats, getAdminCosts, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
-import type { AdminCompany, AdminPlatformStats, AdminInfraCosts } from "@/lib/api";
+import { getAdminCompanies, getAdminStats, getAdminCosts, getAdminTickets, updateAdminTicket, deleteAdminCompany, resetAdminOnboarding } from "@/lib/api";
+import type { AdminCompany, AdminPlatformStats, AdminInfraCosts, AdminTicket } from "@/lib/api";
 
 const API_BASE = "/api";
 function getToken(): string | null {
@@ -73,7 +73,9 @@ export default function AdminPage() {
   const [costsLoading, setCostsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<"overview" | "costs">("overview");
+  const [tab, setTab] = useState<"overview" | "costs" | "tickets">("overview");
+  const [tickets, setTickets] = useState<AdminTicket[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -155,7 +157,7 @@ export default function AdminPage() {
   };
 
   const loadCosts = async () => {
-    if (costs) return; // already loaded
+    if (costs) return;
     setCostsLoading(true);
     try {
       const c = await getAdminCosts();
@@ -164,6 +166,18 @@ export default function AdminPage() {
       alert("Failed to load costs: " + err.message);
     } finally {
       setCostsLoading(false);
+    }
+  };
+
+  const loadTickets = async () => {
+    setTicketsLoading(true);
+    try {
+      const t = await getAdminTickets();
+      setTickets(t);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setTicketsLoading(false);
     }
   };
 
@@ -255,6 +269,18 @@ export default function AdminPage() {
         >
           Infrastructure Costs
         </button>
+        <button
+          onClick={() => { setTab("tickets"); loadTickets(); }}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            tab === "tickets" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Support Tickets {tickets.filter(t => t.status === "open").length > 0 && (
+            <span className="ml-1 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
+              {tickets.filter(t => t.status === "open").length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Costs tab */}
@@ -318,6 +344,72 @@ export default function AdminPage() {
             </>
           ) : (
             <div className="px-6 py-12 text-center text-gray-500">Failed to load costs.</div>
+          )}
+        </div>
+      )}
+
+      {/* Tickets tab */}
+      {tab === "tickets" && (
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="font-semibold text-gray-900">Support Tickets ({tickets.length})</h2>
+          </div>
+          {ticketsLoading ? (
+            <div className="px-6 py-12 text-center text-gray-500">Loading tickets...</div>
+          ) : tickets.length === 0 ? (
+            <div className="px-6 py-12 text-center text-gray-400">No support tickets yet.</div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {tickets.map((ticket) => (
+                <div key={ticket.id} className="px-6 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-900">{ticket.subject}</p>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          ticket.status === "open" ? "bg-red-100 text-red-700"
+                          : ticket.status === "in_progress" ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                        }`}>
+                          {ticket.status}
+                        </span>
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                          {ticket.category}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-600">{ticket.message}</p>
+                      <p className="mt-1 text-xs text-gray-400">
+                        {ticket.company_name} ({ticket.company_email}) — {new Date(ticket.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
+                      {ticket.status === "open" && (
+                        <button
+                          onClick={async () => {
+                            await updateAdminTicket(ticket.id, { status: "in_progress" });
+                            loadTickets();
+                          }}
+                          className="rounded-lg border border-yellow-300 px-2 py-1 text-xs text-yellow-700 hover:bg-yellow-50"
+                        >
+                          In Progress
+                        </button>
+                      )}
+                      {ticket.status !== "resolved" && (
+                        <button
+                          onClick={async () => {
+                            await updateAdminTicket(ticket.id, { status: "resolved" });
+                            loadTickets();
+                          }}
+                          className="rounded-lg border border-green-300 px-2 py-1 text-xs text-green-700 hover:bg-green-50"
+                        >
+                          Resolve
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
