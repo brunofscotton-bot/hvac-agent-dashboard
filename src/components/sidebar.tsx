@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Shield,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
   { href: "/appointments", label: "Appointments", icon: Calendar },
   { href: "/technicians", label: "Technicians", icon: Users },
+  { href: "/pricebook", label: "Pricebook", icon: BookOpen },
   { href: "/customers", label: "Customers", icon: UserCircle },
   { href: "/pricing", label: "Pricing", icon: DollarSign },
   { href: "/calls", label: "Call History", icon: Phone },

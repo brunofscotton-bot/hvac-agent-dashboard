@@ -150,6 +150,23 @@ export const syncJobberTechnicians = () =>
 export const syncJobberSchedules = () =>
   fetchAPI<{ success: boolean; updated: number; message: string }>("/integrations/jobber/sync-schedules", { method: "POST" });
 
+// Pricebook
+export const getPricebookCategories = () => fetchAPI<PricebookCategory[]>("/pricebook/categories");
+export const createPricebookCategory = (data: { name: string }) =>
+  fetchAPI<{ id: string; name: string }>("/pricebook/categories", { method: "POST", body: JSON.stringify(data) });
+export const deletePricebookCategory = (id: string) =>
+  fetchAPI("/pricebook/categories/" + id, { method: "DELETE" });
+export const getPricebookItems = (categoryId?: string) =>
+  fetchAPI<PricebookItem[]>(`/pricebook/items${categoryId ? `?category_id=${categoryId}` : ""}`);
+export const createPricebookItem = (data: Partial<PricebookItem>) =>
+  fetchAPI<{ id: string; name: string }>("/pricebook/items", { method: "POST", body: JSON.stringify(data) });
+export const updatePricebookItem = (id: string, data: Partial<PricebookItem>) =>
+  fetchAPI("/pricebook/items/" + id, { method: "PATCH", body: JSON.stringify(data) });
+export const deletePricebookItem = (id: string) =>
+  fetchAPI("/pricebook/items/" + id, { method: "DELETE" });
+export const seedDefaultPricebook = () =>
+  fetchAPI<{ success: boolean; message: string }>("/pricebook/seed-defaults", { method: "POST" });
+
 // ── Types ───────────────────────────────────────────────────────────────────
 
 export interface DashboardStats {
@@ -247,6 +264,10 @@ export interface Company {
   business_hours_start: number;
   business_hours_end: number;
   call_escalation_enabled?: boolean;
+  emergency_mode?: string;
+  oncall_phone?: string;
+  oncall_backup_phone?: string;
+  oncall_end_hour?: number;
 }
 
 export interface CallLog {
@@ -432,6 +453,31 @@ export interface AdminTicket extends SupportTicket {
   company_name: string;
   company_email: string;
   admin_notes?: string;
+}
+
+export interface PricebookCategory {
+  id: string;
+  name: string;
+  sort_order: number;
+  item_count: number;
+}
+
+export interface PricebookItem {
+  id: string;
+  category_id: string;
+  name: string;
+  description?: string;
+  price_good: number;
+  price_better: number;
+  price_best: number;
+  label_good: string;
+  label_better: string;
+  label_best: string;
+  desc_good?: string;
+  desc_better?: string;
+  desc_best?: string;
+  is_active: boolean;
+  sort_order: number;
 }
 
 export interface AdminInfraCosts {

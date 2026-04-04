@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw, PhoneForwarded, MessageSquare, MapPin } from "lucide-react";
+import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw, PhoneForwarded, MessageSquare, MapPin, Shield } from "lucide-react";
 import { getCompany, updateCompany, getJobberStatus, disconnectJobber, syncJobberTechnicians, syncJobberSchedules, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
@@ -60,6 +60,10 @@ export default function SettingsPage() {
       greeting_message: company.greeting_message,
       recording_disclosure: company.recording_disclosure,
       service_area_zip_codes: company.service_area_zip_codes,
+      emergency_mode: company.emergency_mode,
+      oncall_phone: company.oncall_phone,
+      oncall_backup_phone: company.oncall_backup_phone,
+      oncall_end_hour: company.oncall_end_hour,
     });
     setSaving(false);
     setSaved(true);
@@ -184,6 +188,89 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Emergency / After-Hours */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Emergency / After-Hours</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Configure how the AI agent handles emergency and after-hours calls.
+          </p>
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Emergency Mode</label>
+              <select
+                value={company.emergency_mode ?? "no_oncall"}
+                onChange={(e) => setCompany({ ...company, emergency_mode: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value="no_oncall">No On-Call</option>
+                <option value="24_7_oncall">24/7 On-Call</option>
+                <option value="limited_oncall">Limited On-Call</option>
+              </select>
+              <div className="mt-2 space-y-1">
+                <p className="text-xs text-gray-400">
+                  <strong>No On-Call:</strong> AI takes a message and sends an SMS to the owner.
+                </p>
+                <p className="text-xs text-gray-400">
+                  <strong>24/7 On-Call:</strong> Transfers the call to the on-call technician at any hour.
+                </p>
+                <p className="text-xs text-gray-400">
+                  <strong>Limited On-Call:</strong> Transfers to on-call until a specific hour, then takes a message.
+                </p>
+              </div>
+            </div>
+
+            {(company.emergency_mode === "24_7_oncall" || company.emergency_mode === "limited_oncall") && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">On-Call Phone</label>
+                  <input
+                    value={company.oncall_phone ?? ""}
+                    onChange={(e) => setCompany({ ...company, oncall_phone: e.target.value })}
+                    placeholder="+14075551234"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">Primary on-call technician phone number</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Backup Phone</label>
+                  <input
+                    value={company.oncall_backup_phone ?? ""}
+                    onChange={(e) => setCompany({ ...company, oncall_backup_phone: e.target.value })}
+                    placeholder="+14075559999"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">Backup number if the primary on-call does not answer</p>
+                </div>
+              </>
+            )}
+
+            {company.emergency_mode === "limited_oncall" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">On-Call Until</label>
+                <select
+                  value={company.oncall_end_hour ?? 22}
+                  onChange={(e) => setCompany({ ...company, oncall_end_hour: Number(e.target.value) })}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                >
+                  <option value={20}>8:00 PM</option>
+                  <option value={21}>9:00 PM</option>
+                  <option value={22}>10:00 PM</option>
+                  <option value={23}>11:00 PM</option>
+                  <option value={0}>12:00 AM (Midnight)</option>
+                  <option value={1}>1:00 AM</option>
+                  <option value={2}>2:00 AM</option>
+                  <option value={3}>3:00 AM</option>
+                  <option value={4}>4:00 AM</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-400">After this hour, the AI will take a message instead of transferring</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Twilio */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -212,8 +299,12 @@ export default function SettingsPage() {
           </div>
           <p className="mt-2 text-sm text-gray-500">
             Sync technician calendars to automatically block busy times and prevent double-booking.
-            Click &quot;Send Setup Link&quot; and the technician will receive an SMS — they just tap the link, sign in to Google, and they&apos;re connected.
           </p>
+          <div className="mt-3 rounded-md bg-blue-50 px-3 py-2">
+            <p className="text-xs text-blue-700">
+              Click &quot;Send Link&quot; to SMS a setup link to the technician. They tap the link, sign in with Google, and their calendar syncs automatically.
+            </p>
+          </div>
 
           {/* Technician Calendar Status */}
           <div className="mt-4 space-y-2">
@@ -254,7 +345,7 @@ export default function SettingsPage() {
                       setSendingSmsTo(null);
                     }}
                     disabled={sendingSmsTo === tech.id || smsSent.has(tech.id) || (tech.calendar_provider === "google" && !!tech.google_calendar_id) || tech.calendar_provider !== "google"}
-                    className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs hover:bg-white disabled:opacity-50"
+                    className="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-500 disabled:opacity-50"
                   >
                     <Send className="h-3 w-3" />
                     {tech.calendar_provider !== "google"
