@@ -141,14 +141,31 @@ export default function CallsPage() {
                             {langLabels[call.language_detected ?? ""] ?? call.language_detected ?? "\u2014"}
                           </div>
                         </div>
-                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "100px" }}>
-                          {call.outcome ? (
-                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${outcomeColors[call.outcome] ?? ""}`}>
-                              {outcomeLabels[call.outcome] ?? call.outcome}
-                            </span>
-                          ) : (
-                            "\u2014"
-                          )}
+                        <div className="px-4 py-3 flex-shrink-0" style={{ width: "140px" }}>
+                          <div className="flex flex-wrap items-center gap-1">
+                            {call.outcome ? (
+                              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${outcomeColors[call.outcome] ?? ""}`}>
+                                {outcomeLabels[call.outcome] ?? call.outcome}
+                              </span>
+                            ) : (
+                              "\u2014"
+                            )}
+                            {call.duration_seconds != null && call.duration_seconds < 30 && (
+                              <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
+                                Short
+                              </span>
+                            )}
+                            {call.outcome === "dropped" && (
+                              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                                Review
+                              </span>
+                            )}
+                            {call.outcome === "callback_requested" && (
+                              <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                                Callback
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="min-w-0 flex-1 px-4 py-3 text-gray-600 truncate">
                           {call.summary ?? "\u2014"}

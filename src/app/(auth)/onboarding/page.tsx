@@ -81,6 +81,7 @@ export default function OnboardingPage() {
     languages_supported: "en",
     greeting_message: "",
     voice_gender: "female",
+    service_area_zip_codes: "",
   });
 
   const [technicians, setTechnicians] = useState<TechForm[]>([{ ...emptyTech }]);
@@ -118,6 +119,7 @@ export default function OnboardingPage() {
       technicians: technicians.filter((t) => t.name && t.phone),
       greeting_message: form.greeting_message || undefined,
       send_calendar_sms: sendCalendarSms,
+      service_area_zip_codes: form.service_area_zip_codes || undefined,
     };
 
     try {
@@ -429,6 +431,19 @@ export default function OnboardingPage() {
                   ))}
                 </select>
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Service Area Zip Codes</label>
+              <textarea
+                value={form.service_area_zip_codes}
+                onChange={(e) => updateForm("service_area_zip_codes", e.target.value)}
+                rows={2}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                placeholder="32801, 32803, 34786"
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                Enter zip codes your company serves (e.g., 32801, 32803, 34786). Leave empty to serve all areas.
+              </p>
             </div>
             <p className="text-xs text-gray-400">
               Your AI phone number will be a local number for {form.city || "your city"}, {form.state || "your state"}.

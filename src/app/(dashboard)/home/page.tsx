@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, Phone, DollarSign, TrendingUp, Clock, MapPin } from "lucide-react";
+import { Calendar, Phone, DollarSign, TrendingUp, Clock, MapPin, PhoneForwarded } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
 import { getDashboardStats, getTodayAppointments, type DashboardStats, type Appointment } from "@/lib/api";
 
@@ -47,6 +47,7 @@ export default function DashboardPage() {
           title="Monthly Revenue"
           value={`$${(stats?.month_revenue ?? 0).toLocaleString()}`}
           icon={DollarSign}
+          subtitle={stats?.week_revenue != null ? `$${stats.week_revenue.toLocaleString()} this week` : undefined}
           color="orange"
         />
         <StatCard
@@ -56,6 +57,14 @@ export default function DashboardPage() {
           subtitle={`${stats?.month_bookings ?? 0} bookings from calls`}
           color="purple"
         />
+        {stats?.callbacks_pending != null && stats.callbacks_pending > 0 && (
+          <StatCard
+            title="Callbacks Pending"
+            value={stats.callbacks_pending}
+            icon={PhoneForwarded}
+            color="orange"
+          />
+        )}
       </div>
 
       {/* Today's Schedule */}

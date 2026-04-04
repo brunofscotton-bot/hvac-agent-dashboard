@@ -21,7 +21,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-4 pt-16 md:p-8 md:pt-8">{children}</main>
+      <main className="flex-1 flex flex-col p-4 pt-16 md:p-8 md:pt-8">
+        <div className="flex-1">{children}</div>
+        <footer className="mt-12 border-t border-gray-100 pt-4 pb-2 text-center text-xs text-gray-400">
+          &copy; 2026 Ringa &middot;{" "}
+          <a href="/terms" className="hover:text-gray-600 underline">Terms of Service</a> &middot;{" "}
+          <a href="/privacy" className="hover:text-gray-600 underline">Privacy Policy</a>
+        </footer>
+      </main>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw, PhoneForwarded } from "lucide-react";
+import { Save, Building, Phone, Link2, Unlink, Calendar, Send, RefreshCw, PhoneForwarded, MessageSquare, MapPin } from "lucide-react";
 import { getCompany, updateCompany, getJobberStatus, disconnectJobber, syncJobberTechnicians, syncJobberSchedules, getTechnicians, sendCalendarInstructions, type Company, type Technician } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
@@ -56,6 +56,10 @@ export default function SettingsPage() {
       address: company.address,
       twilio_phone_number: company.twilio_phone_number,
       call_escalation_enabled: company.call_escalation_enabled,
+      agent_name: company.agent_name,
+      greeting_message: company.greeting_message,
+      recording_disclosure: company.recording_disclosure,
+      service_area_zip_codes: company.service_area_zip_codes,
     });
     setSaving(false);
     setSaved(true);
@@ -116,6 +120,67 @@ export default function SettingsPage() {
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Greeting & Disclosure */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Greeting &amp; Disclosure</h2>
+          </div>
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Agent Name</label>
+              <input
+                value={company.agent_name ?? ""}
+                onChange={(e) => setCompany({ ...company, agent_name: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                placeholder="Ana"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Greeting Message</label>
+              <textarea
+                value={company.greeting_message ?? ""}
+                onChange={(e) => setCompany({ ...company, greeting_message: e.target.value })}
+                rows={3}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                placeholder={`Thank you for calling ${company.name}! My name is ${company.agent_name || "Ana"}. How can I help you today?`}
+              />
+              <p className="mt-1 text-xs text-gray-400">Leave blank for the default greeting</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Recording Disclosure</label>
+              <textarea
+                value={company.recording_disclosure ?? "This call may be recorded for quality purposes."}
+                onChange={(e) => setCompany({ ...company, recording_disclosure: e.target.value })}
+                rows={2}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              />
+              <p className="mt-1 text-xs text-gray-400">Played at the start of each call</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Service Area */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold">Service Area</h2>
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700">Service Area Zip Codes</label>
+            <textarea
+              value={company.service_area_zip_codes ?? ""}
+              onChange={(e) => setCompany({ ...company, service_area_zip_codes: e.target.value })}
+              rows={2}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              placeholder="32801, 32803, 34786"
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Enter the zip codes your company serves, separated by commas. Leave empty to accept all areas.
+            </p>
           </div>
         </div>
 

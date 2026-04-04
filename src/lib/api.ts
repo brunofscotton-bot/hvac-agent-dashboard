@@ -159,6 +159,8 @@ export interface DashboardStats {
   month_bookings: number;
   month_revenue: number;
   conversion_rate: number;
+  callbacks_pending?: number;
+  week_revenue?: number;
 }
 
 export interface Appointment {
@@ -235,6 +237,9 @@ export interface Company {
   subscription_status: string;
   subscription_plan?: string;
   agent_name: string;
+  greeting_message?: string;
+  recording_disclosure?: string;
+  service_area_zip_codes?: string;
   languages_supported: string;
   service_fee: number;
   after_hours_fee: number;
@@ -287,6 +292,7 @@ export interface OnboardingData {
   greeting_message?: string;
   voice_gender: string;
   send_calendar_sms?: boolean;
+  service_area_zip_codes?: string;
 }
 
 export interface OnboardingResult {
