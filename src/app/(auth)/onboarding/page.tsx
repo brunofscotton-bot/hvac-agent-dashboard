@@ -109,6 +109,30 @@ export default function OnboardingPage() {
     }
   };
 
+  // ── Per-step validation ─────────────────────────────────────────────────
+  const [stepError, setStepError] = useState("");
+
+  const validateStep = (s: number): boolean => {
+    setStepError("");
+    if (s === 0) {
+      if (!form.company_name.trim()) { setStepError("Company name is required."); return false; }
+      if (!form.city.trim()) { setStepError("City is required."); return false; }
+    }
+    if (s === 2) {
+      const valid = technicians.filter((t) => t.name.trim() && t.phone.trim());
+      if (valid.length === 0) {
+        setStepError("Add at least one technician with a name and phone number.");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (!validateStep(step)) return;
+    setStep((s) => s + 1);
+  };
+
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     setError("");
@@ -385,8 +409,8 @@ export default function OnboardingPage() {
               <label className="block text-sm font-medium text-gray-700">Company Name</label>
               <input
                 value={form.company_name}
-                onChange={(e) => updateForm("company_name", e.target.value)}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                onChange={(e) => { updateForm("company_name", e.target.value); setStepError(""); }}
+                className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm ${stepError && !form.company_name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                 placeholder="Your HVAC Company"
               />
             </div>
@@ -543,7 +567,12 @@ export default function OnboardingPage() {
         {/* Step 2: Technicians */}
         {step === 2 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold">Technicians</h2>
+            <div>
+              <h2 className="text-lg font-bold">Technicians</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                At least one technician with a name and phone is required to launch your agent.
+              </p>
+            </div>
 
             {/* Jobber tip */}
             <div className="rounded-lg border border-green-200 bg-green-50 p-3">
@@ -558,10 +587,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Add at least one technician. Calendar sync is optional — you can set
-                their working hours after onboarding.
-              </p>
+              <p className="text-sm text-gray-400">Calendar sync is optional — you can configure it after setup.</p>
               <button
                 onClick={addTechnician}
                 className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
@@ -587,15 +613,15 @@ export default function OnboardingPage() {
                     required
                     placeholder="Name *"
                     value={tech.name}
-                    onChange={(e) => updateTech(i, "name", e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    onChange={(e) => { updateTech(i, "name", e.target.value); setStepError(""); }}
+                    className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                   />
                   <input
                     required
                     placeholder="Phone * (+1...)"
                     value={tech.phone}
-                    onChange={(e) => updateTech(i, "phone", e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    onChange={(e) => { updateTech(i, "phone", e.target.value); setStepError(""); }}
+                    className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.phone.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
                   />
                   <input
                     placeholder="Email"
@@ -842,22 +868,27 @@ export default function OnboardingPage() {
         )}
 
         {/* Navigation */}
-        <div className="mt-6 flex justify-between">
-          <button
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
-            disabled={step === 0}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium disabled:opacity-30"
-          >
-            Back
-          </button>
+        <div className="mt-6 space-y-3">
+          {stepError && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+              {stepError}
+            </div>
+          )}
+          <div className="flex justify-between">
+            <button
+              onClick={() => { setStepError(""); setStep((s) => Math.max(0, s - 1)); }}
+              disabled={step === 0}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium disabled:opacity-30"
+            >
+              Back
+            </button>
 
-          <div className="flex items-center gap-3">
             {step < steps.length - 1 ? (
               <button
-                onClick={() => setStep((s) => s + 1)}
+                onClick={handleNext}
                 className="rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
               >
-                Continue
+                Continue →
               </button>
             ) : (
               <button
@@ -866,15 +897,9 @@ export default function OnboardingPage() {
                 className="flex items-center gap-2 rounded-lg bg-[#3B6FFF] px-6 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
               >
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {submitting ? "Provisioning..." : "Launch Agent"}
+                {submitting ? "Provisioning..." : "Launch Agent 🚀"}
               </button>
             )}
-            <button
-              onClick={() => router.push("/home")}
-              className="rounded-lg px-4 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              Skip for now →
-            </button>
           </div>
         </div>
       </div>
