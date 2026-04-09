@@ -148,8 +148,9 @@ export default function BillingPage() {
           <div className="mt-4">
             {sub?.plan === "enterprise" ? (
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Pro</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 15 technicians</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Unlimited call minutes</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Pro</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 3-month transcript retention</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Dedicated account manager</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Custom AI training</li>
@@ -157,7 +158,7 @@ export default function BillingPage() {
               </ul>
             ) : sub?.plan === "pro" ? (
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Unlimited technicians</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 5 technicians</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 2,000 minutes/month</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Starter</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Jobber integration</li>
@@ -168,7 +169,7 @@ export default function BillingPage() {
               </ul>
             ) : sub?.plan === "starter" ? (
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 2 technicians</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 1 technician</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 500 minutes/month</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 24/7 call answering</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> English, Spanish & Portuguese</li>
@@ -183,22 +184,19 @@ export default function BillingPage() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm font-semibold text-gray-700">Starter — $120/mo</p>
-                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
-                      <li>Up to 2 technicians, 500 min/mo, Google Calendar, SMS, 15-day transcripts</li>
-                    </ul>
+                    <p className="mt-1 text-xs text-gray-500">1 technician, 500 min/mo, Google Calendar, SMS, 15-day transcripts</p>
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-700">Pro — $250/mo</p>
-                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
-                      <li>Unlimited techs, 2,000 min/mo, Jobber, Pricebook, 30-day transcripts</li>
-                    </ul>
+                    <p className="mt-1 text-xs text-gray-500">Up to 5 techs, 2,000 min/mo, Jobber, Pricebook, 30-day transcripts</p>
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-700">Enterprise — $400/mo</p>
-                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
-                      <li>Unlimited minutes, 3-month transcripts, dedicated manager, SLA</li>
-                    </ul>
+                    <p className="mt-1 text-xs text-gray-500">Up to 15 techs, unlimited minutes, 3-month transcripts, dedicated manager</p>
                   </div>
+                  <p className="text-xs text-gray-400">
+                    Need more than 15 techs? <a href="mailto:hello@ringa.live" className="text-[#3B6FFF] hover:underline">Contact sales</a>
+                  </p>
                 </div>
               </div>
             )}

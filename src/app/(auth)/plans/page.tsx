@@ -6,13 +6,13 @@ import { useAuth } from "@/lib/auth";
 import { getPlans, createCheckout, type PlanInfo } from "@/lib/api";
 
 const ENTERPRISE_FEATURES = [
-  "Everything in Pro",
+  "Up to 15 technicians",
   "Unlimited call minutes",
+  "Everything in Pro",
   "3-month transcript retention",
   "Dedicated account manager",
   "Custom AI training",
   "SLA guarantee",
-  "Priority support",
 ];
 
 const PLAN_DISPLAY: Record<string, { price: number; name: string; features: string[] }> = {
@@ -20,12 +20,13 @@ const PLAN_DISPLAY: Record<string, { price: number; name: string; features: stri
     price: 120,
     name: "Starter",
     features: [
-      "Up to 2 technicians",
+      "1 technician",
       "500 minutes/month",
       "24/7 call answering",
       "English, Spanish & Portuguese",
       "Google Calendar sync",
       "SMS confirmations",
+      "Address verification",
       "15-day transcript retention",
       "Email support",
     ],
@@ -34,7 +35,7 @@ const PLAN_DISPLAY: Record<string, { price: number; name: string; features: stri
     price: 250,
     name: "Pro",
     features: [
-      "Unlimited technicians",
+      "Up to 5 technicians",
       "2,000 minutes/month",
       "Everything in Starter",
       "Jobber integration",
@@ -202,6 +203,10 @@ export default function PlansPage() {
             >
               {activePlan === "enterprise" ? "Active" : isTrialing ? "Activate Now" : "Get Started"}
             </button>
+            <p className="mt-2 text-center text-xs text-gray-400">
+              Need more than 15 techs?{" "}
+              <a href="mailto:hello@ringa.live" className="text-[#3B6FFF] hover:underline">Contact sales</a>
+            </p>
           </div>
         </div>
       </div>

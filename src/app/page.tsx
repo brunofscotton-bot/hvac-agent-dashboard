@@ -354,14 +354,14 @@ export default function LandingPage() {
               <div className="r-plan-price"><span>$</span>120</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Up to 2 technicians</li>
+                <li><span className="r-check">&#10003;</span> 1 technician</li>
                 <li><span className="r-check">&#10003;</span> 500 minutes/month</li>
                 <li><span className="r-check">&#10003;</span> 24/7 call answering</li>
                 <li><span className="r-check">&#10003;</span> English, Spanish &amp; Portuguese</li>
                 <li><span className="r-check">&#10003;</span> Google Calendar sync</li>
                 <li><span className="r-check">&#10003;</span> SMS confirmations</li>
                 <li><span className="r-check">&#10003;</span> Address verification</li>
-                <li><span className="r-check">&#10003;</span> Emergency triage</li>
+                <li><span className="r-check">&#10003;</span> 15-day transcript retention</li>
               </ul>
               <Link href="/signup" className="r-btn-ghost">
                 Start free trial
@@ -374,7 +374,7 @@ export default function LandingPage() {
               <div className="r-plan-price"><span>$</span>250</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Unlimited technicians</li>
+                <li><span className="r-check">&#10003;</span> Up to 5 technicians</li>
                 <li><span className="r-check">&#10003;</span> 2,000 minutes/month</li>
                 <li><span className="r-check">&#10003;</span> Everything in Starter</li>
                 <li><span className="r-check">&#10003;</span> Jobber integration</li>
@@ -394,17 +394,21 @@ export default function LandingPage() {
               <div className="r-plan-price"><span>$</span>400</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Everything in Pro</li>
+                <li><span className="r-check">&#10003;</span> Up to 15 technicians</li>
                 <li><span className="r-check">&#10003;</span> Unlimited call minutes</li>
+                <li><span className="r-check">&#10003;</span> Everything in Pro</li>
                 <li><span className="r-check">&#10003;</span> 3-month transcript retention</li>
                 <li><span className="r-check">&#10003;</span> Dedicated account manager</li>
                 <li><span className="r-check">&#10003;</span> Custom AI training</li>
                 <li><span className="r-check">&#10003;</span> SLA guarantee</li>
-                <li><span className="r-check">&#10003;</span> Priority support</li>
               </ul>
               <Link href="/signup" className="r-btn-ghost">
                 Start free trial
               </Link>
+              <p className="r-plan-note" style={{ marginTop: "8px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>
+                Need more than 15 techs?{" "}
+                <a href="mailto:hello@ringa.live" style={{ color: "var(--blue)" }}>Contact sales</a>
+              </p>
             </div>
           </div>
         </section>
