@@ -14,7 +14,13 @@ async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
     ...((options?.headers as Record<string, string>) || {}),
   };
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeout));
 
   if (res.status === 401) {
     if (typeof window !== "undefined") {
@@ -33,7 +39,8 @@ async function fetchAPI<T>(path: string, options?: RequestInit): Promise<T> {
 
 // Dashboard
 export const getDashboardStats = () => fetchAPI<DashboardStats>("/dashboard/stats");
-export const getRecentCalls = (limit = 20) => fetchAPI<CallLog[]>(`/dashboard/calls?limit=${limit}`);
+export const getRecentCalls = (page = 1, perPage = 20) =>
+  fetchAPI<PaginatedResponse<CallLog>>(`/dashboard/calls?page=${page}&per_page=${perPage}`);
 export const getCallDetail = (id: string) => fetchAPI<CallLog>(`/dashboard/calls/${id}`);
 
 // Appointments

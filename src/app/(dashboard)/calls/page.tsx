@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Phone, Clock, Globe, ChevronDown, ChevronUp } from "lucide-react";
-import { getRecentCalls, type CallLog } from "@/lib/api";
+import { getRecentCalls, type CallLog, type PaginatedResponse } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 const outcomeColors: Record<string, string> = {
@@ -62,18 +62,22 @@ const TRANSCRIPT_RETENTION: Record<string, { days: number; label: string }> = {
 
 export default function CallsPage() {
   const { company } = useAuth();
-  const [calls, setCalls] = useState<CallLog[]>([]);
+  const [data, setData] = useState<PaginatedResponse<CallLog> | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const retention = TRANSCRIPT_RETENTION[company?.subscription_plan ?? "starter"] ?? TRANSCRIPT_RETENTION.starter;
 
   useEffect(() => {
-    getRecentCalls(50)
-      .then(setCalls)
+    setLoading(true);
+    getRecentCalls(page, 20)
+      .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [page]);
+
+  const calls = data?.items ?? [];
 
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "\u2014";
@@ -214,6 +218,31 @@ export default function CallsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {data && data.total > data.per_page && (
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-500">
+            Showing {(page - 1) * data.per_page + 1}–{Math.min(page * data.per_page, data.total)} of {data.total}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page * data.per_page >= data.total}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
