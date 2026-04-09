@@ -432,12 +432,12 @@ export default function PrivacyPolicyPage() {
               <p>
                 Website:{" "}
                 <a
-                  href="https://hvac-agent-dashboard.vercel.app"
+                  href="https://ringa.live"
                   className="text-blue-400 underline hover:text-blue-300"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  hvac-agent-dashboard.vercel.app
+                  ringa.live
                 </a>
               </p>
             </div>
