@@ -69,7 +69,7 @@ export default function PrivacyPolicyPage() {
               1. Introduction
             </h2>
             <p>
-              Ringa LLC ("Company," "we," "us," or "our") operates
+              De Faria Ventures LLC ("Company," "we," "us," or "our") operates
               the Ringa platform ("Service"), an AI-powered phone agent SaaS for
               HVAC companies. This Privacy Policy explains how we collect, use,
               disclose, and safeguard your information when you use our Service.
@@ -417,7 +417,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="mt-3">
               <p>
-                <strong className="text-white">Ringa LLC</strong>
+                <strong className="text-white">De Faria Ventures LLC</strong>
               </p>
               <p>Orlando, FL</p>
               <p>
@@ -446,7 +446,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Footer */}
         <div className="mt-16 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-          <p>&copy; 2026 Ringa LLC. All rights reserved.</p>
+          <p>Ringa is a product operated by De Faria Ventures LLC, a Florida limited liability company.</p>
         </div>
       </div>
     </div>
