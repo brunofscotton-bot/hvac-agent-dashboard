@@ -41,7 +41,7 @@ interface AuthContextType {
 const TOKEN_KEY = "hvac_token";
 const API_BASE = "/api";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/terms", "/privacy", "/quote", "/approve-quote"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/terms", "/privacy", "/quote", "/approve-quote"];
 const LANDING_PATH = "/";
 
 // ── Context ─────────────────────────────────────────────────────────────────
@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
     const isLanding = pathname === LANDING_PATH;
-    const isStaticPage = pathname === "/terms" || pathname === "/privacy";
+    const isStaticPage = pathname === "/terms" || pathname === "/privacy" || pathname.startsWith("/reset-password");
 
     if (!token && !isPublic) {
       router.replace("/login");
