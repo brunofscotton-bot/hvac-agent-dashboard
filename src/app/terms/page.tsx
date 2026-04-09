@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
             </h2>
             <p>
               By accessing or using the Ringa platform ("Service"), operated by
-              De Faria Ventures LLC ("Company," "we," "us," or "our"), you agree
+              Ringa LLC ("Company," "we," "us," or "our"), you agree
               to be bound by these Terms of Service ("Terms"). If you do not
               agree to these Terms, you may not access or use the Service.
             </p>
@@ -414,16 +414,16 @@ export default function TermsOfServicePage() {
             </p>
             <div className="mt-3">
               <p>
-                <strong className="text-white">De Faria Ventures LLC</strong>
+                <strong className="text-white">Ringa LLC</strong>
               </p>
               <p>Orlando, FL</p>
               <p>
                 Email:{" "}
                 <a
-                  href="mailto:bruno.f.scotton@gmail.com"
+                  href="mailto:hello@ringa.ai"
                   className="text-blue-400 underline hover:text-blue-300"
                 >
-                  bruno.f.scotton@gmail.com
+                  hello@ringa.ai
                 </a>
               </p>
               <p>
@@ -443,7 +443,7 @@ export default function TermsOfServicePage() {
 
         {/* Footer */}
         <div className="mt-16 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
-          <p>Ringa is a product of De Faria Ventures LLC. All rights reserved.</p>
+          <p>&copy; 2026 Ringa LLC. All rights reserved.</p>
         </div>
       </div>
     </div>

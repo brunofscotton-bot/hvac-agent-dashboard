@@ -106,11 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
     const isLanding = pathname === LANDING_PATH;
+    const isStaticPage = pathname === "/terms" || pathname === "/privacy";
 
     if (!token && !isPublic) {
       router.replace("/login");
-    } else if (token && company && isPublic && !isLanding) {
-      // Logged in user on public page — redirect to dashboard
+    } else if (token && company && isPublic && !isLanding && !isStaticPage) {
+      // Logged in user on auth page (login/signup) — redirect to dashboard
       if (!company.onboarding_completed) {
         router.replace("/onboarding");
       } else {
