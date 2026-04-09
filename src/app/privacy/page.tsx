@@ -423,10 +423,10 @@ export default function PrivacyPolicyPage() {
               <p>
                 Email:{" "}
                 <a
-                  href="mailto:hello@ringa.ai"
+                  href="mailto:hello@ringa.live"
                   className="text-blue-400 underline hover:text-blue-300"
                 >
-                  hello@ringa.ai
+                  hello@ringa.live
                 </a>
               </p>
               <p>
