@@ -23,6 +23,7 @@ interface Company {
   business_hours_start: number;
   business_hours_end: number;
   call_forwarding_confirmed?: boolean;
+  trial_ends_at?: string;
 }
 
 interface AuthContextType {

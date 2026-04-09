@@ -17,27 +17,30 @@ const ENTERPRISE_FEATURES = [
 
 const PLAN_DISPLAY: Record<string, { price: number; name: string; features: string[] }> = {
   starter: {
-    price: 99,
+    price: 120,
     name: "Starter",
     features: [
-      "Up to 500 minutes/month",
-      "2 technicians",
-      "Appointment booking",
+      "Up to 2 technicians",
+      "500 minutes/month",
+      "24/7 call answering",
+      "English, Spanish & Portuguese",
+      "Google Calendar sync",
       "SMS confirmations",
       "15-day transcript retention",
       "Email support",
     ],
   },
   pro: {
-    price: 299,
+    price: 250,
     name: "Pro",
     features: [
-      "Up to 2,000 minutes/month",
       "Unlimited technicians",
-      "All Starter features",
-      "30-day transcript retention",
+      "2,000 minutes/month",
+      "Everything in Starter",
       "Jobber integration",
       "Pricebook & quotes",
+      "30-day transcript retention",
+      "Round-robin dispatch",
       "Priority support",
     ],
   },
@@ -48,11 +51,12 @@ export default function PlansPage() {
   const [plans, setPlans] = useState<Record<string, PlanInfo>>({});
   const [loading, setLoading] = useState(true);
 
-  const isTrialing = company?.subscription_status === "trialing" || company?.subscription_status === "none";
+  const isTrialing = company?.subscription_status === "trialing";
   const activePlan = company?.subscription_plan;
 
-  // Calculate trial days remaining (assuming 14-day trial from account creation)
-  const trialDaysRemaining = 14; // TODO: compute from company.created_at
+  const trialDaysRemaining = company?.trial_ends_at
+    ? Math.max(0, Math.ceil((new Date(company.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   useEffect(() => {
     getPlans()
@@ -165,15 +169,20 @@ export default function PlansPage() {
           })}
 
           {/* Enterprise */}
-          <div className="rounded-xl border-2 border-gray-200 p-6">
+          <div className={`rounded-xl border-2 p-6 ${activePlan === "enterprise" ? "border-green-400" : "border-gray-200"}`}>
             <span className="mb-3 inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-700">
               <Building2 className="h-3 w-3" /> Enterprise
             </span>
+            {activePlan === "enterprise" && (
+              <span className="mb-3 ml-2 inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                Current Plan
+              </span>
+            )}
             <h3 className="text-lg font-bold">Enterprise</h3>
             <p className="mt-2">
-              <span className="text-2xl font-bold">Custom</span>
+              <span className="text-3xl font-bold">$400</span>
+              <span className="text-gray-500">/month</span>
             </p>
-            <p className="text-xs text-gray-500">per month</p>
             <ul className="mt-6 space-y-3">
               {ENTERPRISE_FEATURES.map((feature) => (
                 <li key={feature} className="flex items-start gap-2 text-sm">
@@ -182,12 +191,17 @@ export default function PlansPage() {
                 </li>
               ))}
             </ul>
-            <a
-              href="mailto:hello@ringa.ai"
-              className="mt-6 block w-full rounded-lg border border-gray-300 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+            <button
+              onClick={() => handleSelect("enterprise")}
+              disabled={activePlan === "enterprise"}
+              className={`mt-6 w-full rounded-lg py-2.5 text-sm font-medium ${
+                activePlan === "enterprise"
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              Contact Sales
-            </a>
+              {activePlan === "enterprise" ? "Active" : isTrialing ? "Activate Now" : "Get Started"}
+            </button>
           </div>
         </div>
       </div>

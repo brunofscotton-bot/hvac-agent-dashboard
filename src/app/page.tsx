@@ -351,7 +351,7 @@ export default function LandingPage() {
             {/* Starter */}
             <div className="r-price-card">
               <div className="r-plan-name">Starter</div>
-              <div className="r-plan-price"><span>$</span>99</div>
+              <div className="r-plan-price"><span>$</span>120</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
                 <li><span className="r-check">&#10003;</span> Up to 2 technicians</li>
@@ -371,7 +371,7 @@ export default function LandingPage() {
             {/* Pro */}
             <div className="r-price-card featured">
               <div className="r-plan-name">Pro</div>
-              <div className="r-plan-price"><span>$</span>299</div>
+              <div className="r-plan-price"><span>$</span>250</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
                 <li><span className="r-check">&#10003;</span> Unlimited technicians</li>
@@ -391,7 +391,7 @@ export default function LandingPage() {
             {/* Enterprise */}
             <div className="r-price-card">
               <div className="r-plan-name">Enterprise</div>
-              <div className="r-plan-price" style={{ fontSize: "32px" }}>Custom</div>
+              <div className="r-plan-price"><span>$</span>400</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
                 <li><span className="r-check">&#10003;</span> Everything in Pro</li>
@@ -402,8 +402,8 @@ export default function LandingPage() {
                 <li><span className="r-check">&#10003;</span> SLA guarantee</li>
                 <li><span className="r-check">&#10003;</span> Priority support</li>
               </ul>
-              <Link href="mailto:hello@ringa.ai" className="r-btn-ghost">
-                Contact sales
+              <Link href="/signup" className="r-btn-ghost">
+                Start free trial
               </Link>
             </div>
           </div>

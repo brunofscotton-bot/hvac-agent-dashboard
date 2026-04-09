@@ -274,6 +274,7 @@ export interface Company {
   escalation_phone?: string;
   escalation_conditions?: string;
   call_forwarding_confirmed?: boolean;
+  trial_ends_at?: string;
   emergency_mode?: string;
   oncall_phone?: string;
   oncall_backup_phone?: string;
