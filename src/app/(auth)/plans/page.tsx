@@ -5,7 +5,7 @@ import { Check, Clock, Star, Building2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { getPlans, createCheckout, type PlanInfo } from "@/lib/api";
 
-const ENTERPRISE_FEATURES = [
+const BUSINESS_FEATURES = [
   "Up to 15 technicians",
   "Unlimited call minutes",
   "Everything in Pro",
@@ -13,36 +13,38 @@ const ENTERPRISE_FEATURES = [
   "Dedicated account manager",
   "Custom AI training",
   "SLA guarantee",
+  "Multi-location support",
 ];
 
 const PLAN_DISPLAY: Record<string, { price: number; name: string; features: string[] }> = {
   starter: {
-    price: 120,
+    price: 99,
     name: "Starter",
     features: [
       "1 technician",
-      "500 minutes/month",
+      "300 minutes/month",
       "24/7 call answering",
       "English, Spanish & Portuguese",
       "Google Calendar sync",
       "SMS confirmations",
       "Address verification",
       "15-day transcript retention",
-      "Email support",
+      "$0.35/min overage",
     ],
   },
   pro: {
-    price: 250,
+    price: 249,
     name: "Pro",
     features: [
       "Up to 5 technicians",
-      "2,000 minutes/month",
+      "1,500 minutes/month",
       "Everything in Starter",
       "Jobber integration",
+      "Round-robin dispatch",
       "Pricebook & quotes",
       "30-day transcript retention",
-      "Round-robin dispatch",
       "Priority support",
+      "$0.35/min overage",
     ],
   },
 };
@@ -169,23 +171,23 @@ export default function PlansPage() {
             );
           })}
 
-          {/* Enterprise */}
-          <div className={`rounded-xl border-2 p-6 ${activePlan === "enterprise" ? "border-green-400" : "border-gray-200"}`}>
+          {/* Business */}
+          <div className={`rounded-xl border-2 p-6 ${activePlan === "business" ? "border-green-400" : "border-gray-200"}`}>
             <span className="mb-3 inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-semibold text-purple-700">
-              <Building2 className="h-3 w-3" /> Enterprise
+              <Building2 className="h-3 w-3" /> Business
             </span>
-            {activePlan === "enterprise" && (
+            {activePlan === "business" && (
               <span className="mb-3 ml-2 inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
                 Current Plan
               </span>
             )}
-            <h3 className="text-lg font-bold">Enterprise</h3>
+            <h3 className="text-lg font-bold">Business</h3>
             <p className="mt-2">
-              <span className="text-3xl font-bold">$400</span>
+              <span className="text-3xl font-bold">$449</span>
               <span className="text-gray-500">/month</span>
             </p>
             <ul className="mt-6 space-y-3">
-              {ENTERPRISE_FEATURES.map((feature) => (
+              {BUSINESS_FEATURES.map((feature) => (
                 <li key={feature} className="flex items-start gap-2 text-sm">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
                   {feature}
@@ -193,15 +195,15 @@ export default function PlansPage() {
               ))}
             </ul>
             <button
-              onClick={() => handleSelect("enterprise")}
-              disabled={activePlan === "enterprise"}
+              onClick={() => handleSelect("business")}
+              disabled={activePlan === "business"}
               className={`mt-6 w-full rounded-lg py-2.5 text-sm font-medium ${
-                activePlan === "enterprise"
+                activePlan === "business"
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {activePlan === "enterprise" ? "Active" : isTrialing ? "Activate Now" : "Get Started"}
+              {activePlan === "business" ? "Active" : isTrialing ? "Activate Now" : "Get Started"}
             </button>
             <p className="mt-2 text-center text-xs text-gray-400">
               Need more than 15 techs?{" "}

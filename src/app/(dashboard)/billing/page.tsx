@@ -123,19 +123,19 @@ export default function BillingPage() {
                   onClick={() => handleSubscribe("starter")}
                   className="rounded-lg border border-[#3B6FFF] px-4 py-2 text-sm font-medium text-[#3B6FFF] hover:bg-[#3B6FFF]/10"
                 >
-                  Starter — $120/mo
+                  Starter — $99/mo
                 </button>
                 <button
                   onClick={() => handleSubscribe("pro")}
                   className="rounded-lg bg-[#3B6FFF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
                 >
-                  Pro — $250/mo
+                  Pro — $249/mo
                 </button>
                 <button
-                  onClick={() => handleSubscribe("enterprise")}
+                  onClick={() => handleSubscribe("business")}
                   className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Enterprise — $400/mo
+                  Business — $449/mo
                 </button>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function BillingPage() {
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="text-lg font-semibold">Plan Features</h2>
           <div className="mt-4">
-            {sub?.plan === "enterprise" ? (
+            {sub?.plan === "business" ? (
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 15 technicians</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Unlimited call minutes</li>
@@ -159,7 +159,7 @@ export default function BillingPage() {
             ) : sub?.plan === "pro" ? (
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 5 technicians</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 2,000 minutes/month</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 1,500 minutes/month</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Starter</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Jobber integration</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Pricebook & quotes</li>
@@ -170,28 +170,28 @@ export default function BillingPage() {
             ) : sub?.plan === "starter" ? (
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 1 technician</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 500 minutes/month</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 300 minutes/month</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 24/7 call answering</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> English, Spanish & Portuguese</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Google Calendar sync</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> SMS confirmations</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 15-day transcript retention</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Email support</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> $0.35/min overage</li>
               </ul>
             ) : (
               <div>
                 <p className="text-sm text-gray-500 mb-3">Choose a plan to unlock all features:</p>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Starter — $120/mo</p>
-                    <p className="mt-1 text-xs text-gray-500">1 technician, 500 min/mo, Google Calendar, SMS, 15-day transcripts</p>
+                    <p className="text-sm font-semibold text-gray-700">Starter — $99/mo</p>
+                    <p className="mt-1 text-xs text-gray-500">1 technician, 300 min/mo, Google Calendar, SMS, 15-day transcripts</p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Pro — $250/mo</p>
-                    <p className="mt-1 text-xs text-gray-500">Up to 5 techs, 2,000 min/mo, Jobber, Pricebook, 30-day transcripts</p>
+                    <p className="text-sm font-semibold text-gray-700">Pro — $249/mo</p>
+                    <p className="mt-1 text-xs text-gray-500">Up to 5 techs, 1,500 min/mo, Jobber, Pricebook, 30-day transcripts</p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Enterprise — $400/mo</p>
+                    <p className="text-sm font-semibold text-gray-700">Business — $449/mo</p>
                     <p className="mt-1 text-xs text-gray-500">Up to 15 techs, unlimited minutes, 3-month transcripts, dedicated manager</p>
                   </div>
                   <p className="text-xs text-gray-400">

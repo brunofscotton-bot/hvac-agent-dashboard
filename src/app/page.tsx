@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StepAnimator, ScrollButton } from "./LandingInteractive";
+import PricingSection from "./PricingSection";
 
 /* ── Ringa Soundwave Logo ─────────────────────────────────────────────── */
 function RingaLogo({ size = 32 }: { size?: number }) {
@@ -341,76 +342,13 @@ export default function LandingPage() {
         <section className="r-section" id="pricing" style={{ borderTop: "1px solid var(--border)" }}>
           <div className="r-section-label">Pricing</div>
           <h2 className="r-section-title">
-            Simple pricing.<br />Pays for itself in one call.
+            One missed call costs more<br />than a full year of Ringa.
           </h2>
           <p className="r-section-sub">
-            No setup fees. No contracts. Cancel anytime.
+            Your Ringa receptionist goes live in under 5 minutes. No contracts. No setup fees. Cancel anytime.
           </p>
 
-          <div className="r-pricing">
-            {/* Starter */}
-            <div className="r-price-card">
-              <div className="r-plan-name">Starter</div>
-              <div className="r-plan-price"><span>$</span>120</div>
-              <div className="r-plan-period">per month</div>
-              <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> 1 technician</li>
-                <li><span className="r-check">&#10003;</span> 500 minutes/month</li>
-                <li><span className="r-check">&#10003;</span> 24/7 call answering</li>
-                <li><span className="r-check">&#10003;</span> English, Spanish &amp; Portuguese</li>
-                <li><span className="r-check">&#10003;</span> Google Calendar sync</li>
-                <li><span className="r-check">&#10003;</span> SMS confirmations</li>
-                <li><span className="r-check">&#10003;</span> Address verification</li>
-                <li><span className="r-check">&#10003;</span> 15-day transcript retention</li>
-              </ul>
-              <Link href="/signup" className="r-btn-ghost">
-                Start free trial
-              </Link>
-            </div>
-
-            {/* Pro */}
-            <div className="r-price-card featured">
-              <div className="r-plan-name">Pro</div>
-              <div className="r-plan-price"><span>$</span>250</div>
-              <div className="r-plan-period">per month</div>
-              <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Up to 5 technicians</li>
-                <li><span className="r-check">&#10003;</span> 2,000 minutes/month</li>
-                <li><span className="r-check">&#10003;</span> Everything in Starter</li>
-                <li><span className="r-check">&#10003;</span> Jobber integration</li>
-                <li><span className="r-check">&#10003;</span> Pricebook &amp; quotes</li>
-                <li><span className="r-check">&#10003;</span> 30-day transcript retention</li>
-                <li><span className="r-check">&#10003;</span> Round-robin dispatch</li>
-                <li><span className="r-check">&#10003;</span> Priority support</li>
-              </ul>
-              <Link href="/signup" className="r-btn r-btn-lg" style={{ width: "100%", justifyContent: "center" }}>
-                Start free trial
-              </Link>
-            </div>
-
-            {/* Enterprise */}
-            <div className="r-price-card">
-              <div className="r-plan-name">Enterprise</div>
-              <div className="r-plan-price"><span>$</span>400</div>
-              <div className="r-plan-period">per month</div>
-              <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Up to 15 technicians</li>
-                <li><span className="r-check">&#10003;</span> Unlimited call minutes</li>
-                <li><span className="r-check">&#10003;</span> Everything in Pro</li>
-                <li><span className="r-check">&#10003;</span> 3-month transcript retention</li>
-                <li><span className="r-check">&#10003;</span> Dedicated account manager</li>
-                <li><span className="r-check">&#10003;</span> Custom AI training</li>
-                <li><span className="r-check">&#10003;</span> SLA guarantee</li>
-              </ul>
-              <Link href="/signup" className="r-btn-ghost">
-                Start free trial
-              </Link>
-              <p className="r-plan-note" style={{ marginTop: "8px", fontSize: "12px", color: "var(--text-muted)", textAlign: "center" }}>
-                Need more than 15 techs?{" "}
-                <a href="mailto:hello@ringa.live" style={{ color: "var(--blue)" }}>Contact sales</a>
-              </p>
-            </div>
-          </div>
+          <PricingSection />
         </section>
 
         {/* CTA */}

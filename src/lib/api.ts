@@ -107,10 +107,10 @@ export const completeOnboarding = (data: OnboardingData) =>
 
 // Billing
 export const getPlans = () => fetchAPI<Record<string, PlanInfo>>("/billing/plans");
-export const createCheckout = (plan: string, successUrl: string, cancelUrl: string) =>
+export const createCheckout = (plan: string, successUrl: string, cancelUrl: string, annual = false) =>
   fetchAPI<{ checkout_url: string }>("/billing/checkout", {
     method: "POST",
-    body: JSON.stringify({ plan, success_url: successUrl, cancel_url: cancelUrl }),
+    body: JSON.stringify({ plan, success_url: successUrl, cancel_url: cancelUrl, annual }),
   });
 export const createPortal = (returnUrl: string) =>
   fetchAPI<{ portal_url: string }>("/billing/portal", {
