@@ -1,6 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { StepAnimator, ScrollButton } from "./LandingInteractive";
 import PricingSection from "./PricingSection";
+import LangSwitcher from "./LangSwitcher";
+import { LANDING_TEXT, type LandingLang } from "./landing-i18n";
 
 /* ── Ringa Soundwave Logo ─────────────────────────────────────────────── */
 function RingaLogo({ size = 32 }: { size?: number }) {
@@ -76,6 +81,9 @@ function IconMessageSquare() {
 }
 
 export default function LandingPage() {
+  const [lang, setLang] = useState<LandingLang>("en");
+  const t = (key: string) => LANDING_TEXT[lang][key] || LANDING_TEXT.en[key] || key;
+
   return (
     <>
       {/* Mounts the IntersectionObserver for step animations */}
@@ -89,13 +97,14 @@ export default function LandingPage() {
             <span>ringa</span>
           </div>
           <ul className="r-nav-links">
-            <li><ScrollButton targetId="features">Features</ScrollButton></li>
-            <li><ScrollButton targetId="how">How it works</ScrollButton></li>
-            <li><ScrollButton targetId="pricing">Pricing</ScrollButton></li>
+            <li><ScrollButton targetId="features">{t("nav_features")}</ScrollButton></li>
+            <li><ScrollButton targetId="how">{t("nav_how")}</ScrollButton></li>
+            <li><ScrollButton targetId="pricing">{t("nav_pricing")}</ScrollButton></li>
           </ul>
           <div className="r-nav-right">
-            <Link href="/login" className="r-nav-signin">Sign In</Link>
-            <Link href="/signup" className="r-btn">Start Free Trial</Link>
+            <LangSwitcher lang={lang} onChange={setLang} />
+            <Link href="/login" className="r-nav-signin">{t("nav_signin")}</Link>
+            <Link href="/signup" className="r-btn">{t("nav_cta")}</Link>
           </div>
         </nav>
 
@@ -103,26 +112,22 @@ export default function LandingPage() {
         <div className="r-hero">
           <div className="r-badge">
             <span className="r-badge-dot" />
-            Live on every call, 24/7
+            {t("badge")}
           </div>
 
           <h1>
-            Your front desk,<br />
-            <span className="gradient">always on.</span>
+            {t("hero_1")}<br />
+            <span className="gradient">{t("hero_2")}</span>
           </h1>
 
-          <p className="r-hero-sub">
-            Ringa answers every call, books every job, and dispatches your techs
-            &mdash; in English, Spanish, or Portuguese &mdash; while you focus on
-            the work.
-          </p>
+          <p className="r-hero-sub">{t("hero_sub")}</p>
 
           <div className="r-hero-actions">
             <Link href="/signup" className="r-btn r-btn-lg">
-              Start Free Trial &rarr;
+              {t("hero_cta")}
             </Link>
             <ScrollButton targetId="how" className="r-btn-outline">
-              See how it works
+              {t("hero_cta2")}
             </ScrollButton>
           </div>
 
@@ -179,121 +184,80 @@ export default function LandingPage() {
         {/* STATS */}
         <div className="r-stats">
           <div className="r-stat">
-            <div className="r-stat-num">$120K</div>
-            <div className="r-stat-label">avg. annual revenue lost to missed calls</div>
+            <div className="r-stat-num">{t("stat1_num")}</div>
+            <div className="r-stat-label">{t("stat1_label")}</div>
           </div>
           <div className="r-stat">
-            <div className="r-stat-num">80%</div>
-            <div className="r-stat-label">of callers won&apos;t leave a voicemail</div>
+            <div className="r-stat-num">{t("stat2_num")}</div>
+            <div className="r-stat-label">{t("stat2_label")}</div>
           </div>
           <div className="r-stat">
-            <div className="r-stat-num">24/7</div>
-            <div className="r-stat-label">coverage, zero overtime</div>
+            <div className="r-stat-num">{t("stat3_num")}</div>
+            <div className="r-stat-label">{t("stat3_label")}</div>
           </div>
           <div className="r-stat">
-            <div className="r-stat-num">3</div>
-            <div className="r-stat-label">languages, automatic detection</div>
+            <div className="r-stat-num">{t("stat4_num")}</div>
+            <div className="r-stat-label">{t("stat4_label")}</div>
           </div>
         </div>
 
         {/* FEATURES */}
         <section className="r-section" id="features">
-          <div className="r-section-label">Features</div>
+          <div className="r-section-label">{t("features_label")}</div>
           <h2 className="r-section-title">
-            Everything your front desk<br />should do. Automatically.
+            {t("features_title_1")}<br />{t("features_title_2")}
           </h2>
-          <p className="r-section-sub">
-            Built specifically for HVAC companies. No generic chatbots. No call centers. Just a system that works.
-          </p>
+          <p className="r-section-sub">{t("features_sub")}</p>
 
           <div className="r-features">
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconPhone /></div>
-              <h3>Answers every call</h3>
-              <p>Never send a customer to voicemail again. Ringa picks up instantly, 24 hours a day, 365 days a year &mdash; including holidays and heat waves.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconCalendar /></div>
-              <h3>Smart calendar sync</h3>
-              <p>One-click Google Calendar connection for each technician. Ringa checks real-time availability, prevents double bookings, and assigns jobs with round-robin fairness.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconGlobe /></div>
-              <h3>Trilingual by default</h3>
-              <p>Detects and switches between English, Spanish, and Portuguese mid-call &mdash; automatically. No menus, no &ldquo;press 2 for Spanish.&rdquo;</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconAlert /></div>
-              <h3>Emergency triage</h3>
-              <p>Recognizes urgent keywords like &ldquo;no heat,&rdquo; &ldquo;gas smell,&rdquo; or &ldquo;flooding&rdquo; and prioritizes the call for immediate dispatch.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconMapPin /></div>
-              <h3>Address verification</h3>
-              <p>Every address is validated via Google Maps before the job is booked. No wrong addresses, no wasted drive time, no callbacks.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconMessageSquare /></div>
-              <h3>SMS confirmations</h3>
-              <p>Both the customer and the technician receive instant SMS confirmations with appointment details, address, and time &mdash; automatically.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconUsers /></div>
-              <h3>Round-robin dispatch</h3>
-              <p>Jobs are distributed fairly across your team. Ringa tracks who was last assigned and rotates automatically &mdash; while always respecting customer time preferences.</p>
-            </div>
-            <div className="r-feature">
-              <div className="r-feature-icon"><IconZap /></div>
-              <h3>Setup in 5 minutes</h3>
-              <p>Add your company, invite your techs, and go live. Technicians connect their calendar with one tap from an SMS link. No IT team needed.</p>
-            </div>
+            {[
+              { icon: <IconPhone />, key: "feat1" },
+              { icon: <IconCalendar />, key: "feat2" },
+              { icon: <IconGlobe />, key: "feat3" },
+              { icon: <IconAlert />, key: "feat4" },
+              { icon: <IconMapPin />, key: "feat5" },
+              { icon: <IconMessageSquare />, key: "feat6" },
+              { icon: <IconUsers />, key: "feat7" },
+              { icon: <IconZap />, key: "feat8" },
+              { icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B8FFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>, key: "feat9" },
+            ].map(({ icon, key }) => (
+              <div key={key} className="r-feature">
+                <div className="r-feature-icon">{icon}</div>
+                <h3>{t(`${key}_title`)}</h3>
+                <p>{t(`${key}_desc`)}</p>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* HOW IT WORKS */}
         <section className="r-section" id="how" style={{ borderTop: "1px solid var(--border)" }}>
-          <div className="r-section-label">How it works</div>
+          <div className="r-section-label">{t("how_label")}</div>
           <h2 className="r-section-title">
-            Three steps to never miss<br />a call again.
+            {t("how_title_1")}<br />{t("how_title_2")}
           </h2>
-          <p className="r-section-sub">
-            No IT team required. No contracts. No training sessions.
-          </p>
+          <p className="r-section-sub">{t("how_sub")}</p>
 
           <div className="r-steps">
-            <div className="r-step">
-              <div className="r-step-num">1</div>
-              <div className="r-step-content">
-                <h3>Set up your account in 5 minutes</h3>
-                <p>Enter your company name, add your technicians, and set working hours. Each tech receives an SMS to connect their Google Calendar with one tap.</p>
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="r-step">
+                <div className="r-step-num">{n}</div>
+                <div className="r-step-content">
+                  <h3>{t(`how_step${n}_title`)}</h3>
+                  <p>{t(`how_step${n}_desc`)}</p>
+                </div>
               </div>
-            </div>
-            <div className="r-step">
-              <div className="r-step-num">2</div>
-              <div className="r-step-content">
-                <h3>Forward your number to Ringa</h3>
-                <p>Point your existing business number to Ringa. Customers call the same number they always have. Everything else is automatic.</p>
-              </div>
-            </div>
-            <div className="r-step">
-              <div className="r-step-num">3</div>
-              <div className="r-step-content">
-                <h3>Wake up to a full schedule</h3>
-                <p>Every call answered, every job booked, every address verified. Your technicians start the day with a full calendar &mdash; no callbacks required from you.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
         {/* LANGUAGES */}
         <section className="r-section" style={{ borderTop: "1px solid var(--border)" }}>
-          <div className="r-section-label">Multilingual</div>
+          <div className="r-section-label">{t("lang_label")}</div>
           <h2 className="r-section-title">
-            Speak your customer&apos;s language.<br />Every single time.
+            {t("lang_title_1")}<br />{t("lang_title_2")}
           </h2>
-          <p className="r-section-sub">
-            Ringa detects the caller&apos;s language in real time and responds fluently &mdash; no menus, no delays, no lost customers.
-          </p>
+          <p className="r-section-sub">{t("lang_sub")}</p>
 
           <div className="r-langs">
             <div className="r-lang"><span className="r-lang-flag">{"\uD83C\uDDFA\uD83C\uDDF8"}</span> English</div>
@@ -354,19 +318,18 @@ export default function LandingPage() {
         {/* CTA */}
         <div className="r-cta">
           <div className="r-cta-box">
-            <div className="r-section-label" style={{ marginBottom: "16px" }}>Get started today</div>
+            <div className="r-section-label" style={{ marginBottom: "16px" }}>{t("cta_label")}</div>
             <h2 className="r-section-title" style={{ marginBottom: "12px" }}>
-              Stop losing jobs<br />to voicemail.
+              {t("cta_title_1")}<br />{t("cta_title_2")}
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "16px", marginBottom: "32px", lineHeight: "1.7" }}>
-              The average HVAC company loses $45,000&ndash;$120,000 per year from missed calls.
-              Ringa pays for itself the first week.
+              {t("cta_sub")}
             </p>
             <Link href="/signup" className="r-btn r-btn-lg" style={{ fontSize: "16px", padding: "16px 40px" }}>
-              Start your free trial &rarr;
+              {t("cta_btn")}
             </Link>
             <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "14px" }}>
-              No credit card required. Agent active in 5 minutes.
+              {t("cta_note")}
             </p>
           </div>
         </div>

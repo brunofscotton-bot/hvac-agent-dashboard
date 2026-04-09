@@ -71,6 +71,20 @@
   align-items: center;
   gap: 12px;
 }
+.r-lang-switcher {
+  display: flex; gap: 4px; align-items: center;
+}
+.r-lang-btn {
+  background: none; border: 1px solid transparent; border-radius: 6px;
+  font-size: 18px; cursor: pointer; padding: 2px 6px;
+  opacity: 0.5; transition: opacity 0.2s, border-color 0.2s;
+  line-height: 1;
+}
+.r-lang-btn:hover { opacity: 0.8; }
+.r-lang-btn.active {
+  opacity: 1; border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+}
 .r-nav-signin {
   color: var(--text-secondary);
   font-size: 14px;
