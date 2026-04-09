@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
       <h1 className="text-xl font-bold text-white">Sign in to your account</h1>
-      <p className="mt-1 text-sm text-gray-400">Manage your AI phone agent</p>
+      <p className="mt-1 text-sm text-gray-400">Manage your Ringa receptionist</p>
 
       {error && (
         <div className="mt-4 rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-300">{error}</div>

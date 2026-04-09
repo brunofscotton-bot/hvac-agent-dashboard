@@ -25,7 +25,7 @@ function CallForwardingBanner({ onDismiss }: { onDismiss: () => void }) {
       <div className="flex items-center gap-2">
         <span className="text-base">⚠️</span>
         <span>
-          <strong>Call forwarding not set up.</strong> Your AI agent won&apos;t receive calls until you forward your business number to Ringa.{" "}
+          <strong>Call forwarding not set up.</strong> Your Ringa receptionist won&apos;t receive calls until you forward your business number to Ringa.{" "}
           <Link href="/onboarding" className="underline hover:text-amber-100">
             See setup guide →
           </Link>

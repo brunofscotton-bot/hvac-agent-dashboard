@@ -197,7 +197,7 @@ export default function SettingsPage() {
             <h2 className="text-lg font-semibold">Emergency / After-Hours</h2>
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Configure how the AI agent handles emergency and after-hours calls.
+            Configure how your Ringa receptionist handles emergency and after-hours calls.
           </p>
           <div className="mt-4 space-y-4">
             <div>

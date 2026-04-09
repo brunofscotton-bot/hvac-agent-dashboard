@@ -174,7 +174,7 @@ export default function OnboardingPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <Check className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="mt-4 text-xl font-bold">Your AI Agent is Ready!</h2>
+          <h2 className="mt-4 text-xl font-bold">Your Ringa Receptionist is Ready!</h2>
           <p className="mt-2 text-gray-600">{result.message}</p>
           {result.phone_number && (
             <div className="mt-6 rounded-lg bg-[#3B6FFF]/10 p-4">
@@ -702,7 +702,7 @@ export default function OnboardingPage() {
                 placeholder="Ana"
               />
               <p className="mt-1 text-xs text-gray-400">
-                The name your AI agent will use when greeting callers
+                The name your Ringa receptionist will use when greeting callers
               </p>
             </div>
             <div>
@@ -732,7 +732,7 @@ export default function OnboardingPage() {
                 })}
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Choose the voice your AI agent will use on calls
+                Choose the voice your Ringa receptionist will use on calls
               </p>
             </div>
             <div>
@@ -789,7 +789,7 @@ export default function OnboardingPage() {
           <div className="space-y-4">
             <h2 className="text-lg font-bold">Review & Launch</h2>
             <p className="text-sm text-gray-500">
-              Review your settings before we provision your AI phone agent.
+              Review your settings before we activate your Ringa receptionist.
             </p>
 
             <div className="space-y-3">
@@ -832,7 +832,7 @@ export default function OnboardingPage() {
 
               <div className="rounded-lg bg-gray-50 p-4">
                 <h3 className="text-sm font-semibold text-gray-700">
-                  AI Agent
+                  Ringa Receptionist
                 </h3>
                 <p className="mt-1 text-sm">
                   Name: {form.agent_name} | Voice: {form.voice_gender === "male" ? "Male" : "Female"} | Languages:{" "}
@@ -847,7 +847,7 @@ export default function OnboardingPage() {
               </p>
               <ul className="mt-2 space-y-1 text-sm text-[#3B6FFF]">
                 <li>1. Activate your Ringa assistant with a phone number from {form.city}, {form.state}</li>
-                <li>2. Create your custom AI agent with the settings above</li>
+                <li>2. Configure your Ringa receptionist with the settings above</li>
                 <li>3. Connect everything so you can start receiving calls</li>
               </ul>
             </div>

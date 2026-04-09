@@ -131,7 +131,7 @@ export default function PricingPage() {
 
         {/* Preview */}
         <div className="rounded-lg bg-blue-50 p-4">
-          <p className="text-sm font-medium text-blue-800">What the AI agent will tell customers:</p>
+          <p className="text-sm font-medium text-blue-800">What your Ringa receptionist will tell customers:</p>
           <p className="mt-2 text-sm text-blue-700">
             &ldquo;Our diagnostic visit fee is ${company.service_fee} during business hours.
             For after-hours and weekend visits, the fee is ${company.after_hours_fee}.

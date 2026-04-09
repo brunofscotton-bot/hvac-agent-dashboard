@@ -34,7 +34,7 @@ export default function SignupPage() {
     <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
       <h1 className="text-xl font-bold text-white">Create your account</h1>
       <p className="mt-1 text-sm text-gray-400">
-        Get your AI phone agent up and running in minutes
+        Get your Ringa receptionist up and running in minutes
       </p>
 
       {error && (

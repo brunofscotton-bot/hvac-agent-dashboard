@@ -93,7 +93,7 @@ export default function CallsPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Call History</h1>
-      <p className="mt-1 text-gray-500">All incoming calls handled by the AI agent</p>
+      <p className="mt-1 text-gray-500">All incoming calls handled by your Ringa receptionist</p>
 
       <div className="mt-6 overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="min-w-[700px] w-full text-left text-sm">
@@ -116,7 +116,7 @@ export default function CallsPage() {
             ) : calls.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  No calls recorded yet. Calls will appear here once the AI agent starts handling phone calls.
+                  No calls recorded yet. Calls will appear here once your Ringa receptionist starts handling calls.
                 </td>
               </tr>
             ) : (

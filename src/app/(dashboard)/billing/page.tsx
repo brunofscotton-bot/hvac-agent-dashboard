@@ -123,13 +123,19 @@ export default function BillingPage() {
                   onClick={() => handleSubscribe("starter")}
                   className="rounded-lg border border-[#3B6FFF] px-4 py-2 text-sm font-medium text-[#3B6FFF] hover:bg-[#3B6FFF]/10"
                 >
-                  Starter — $99/mo
+                  Starter — $120/mo
                 </button>
                 <button
                   onClick={() => handleSubscribe("pro")}
                   className="rounded-lg bg-[#3B6FFF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
                 >
-                  Pro — $299/mo
+                  Pro — $250/mo
+                </button>
+                <button
+                  onClick={() => handleSubscribe("enterprise")}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Enterprise — $400/mo
                 </button>
               </div>
             </div>
@@ -140,24 +146,61 @@ export default function BillingPage() {
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="text-lg font-semibold">Plan Features</h2>
           <div className="mt-4">
-            {sub?.plan === "pro" ? (
+            {sub?.plan === "enterprise" ? (
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Pro</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Unlimited call minutes</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 3-month transcript retention</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Dedicated account manager</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Custom AI training</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> SLA guarantee</li>
+              </ul>
+            ) : sub?.plan === "pro" ? (
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Unlimited technicians</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Multilingual support (EN/PT/ES)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 2,000 minutes/month</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Everything in Starter</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Jobber integration</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Pricebook & quotes</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 30-day transcript retention</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Round-robin dispatch</li>
                 <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Priority support</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Custom agent personality</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Advanced analytics</li>
               </ul>
             ) : sub?.plan === "starter" ? (
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 1 AI phone agent</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 1 dedicated phone number</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 3 technicians</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Google Calendar integration</li>
-                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> SMS notifications</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Up to 2 technicians</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 500 minutes/month</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 24/7 call answering</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> English, Spanish & Portuguese</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Google Calendar sync</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> SMS confirmations</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> 15-day transcript retention</li>
+                <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /> Email support</li>
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">Subscribe to see plan features</p>
+              <div>
+                <p className="text-sm text-gray-500 mb-3">Choose a plan to unlock all features:</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700">Starter — $120/mo</p>
+                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
+                      <li>Up to 2 technicians, 500 min/mo, Google Calendar, SMS, 15-day transcripts</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700">Pro — $250/mo</p>
+                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
+                      <li>Unlimited techs, 2,000 min/mo, Jobber, Pricebook, 30-day transcripts</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700">Enterprise — $400/mo</p>
+                    <ul className="mt-1 space-y-1 text-xs text-gray-500">
+                      <li>Unlimited minutes, 3-month transcripts, dedicated manager, SLA</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

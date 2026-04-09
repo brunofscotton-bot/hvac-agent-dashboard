@@ -91,7 +91,7 @@ export default function PlansPage() {
       <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
         <h1 className="text-center text-xl font-bold">Choose Your Plan</h1>
         <p className="mt-1 text-center text-sm text-gray-500">
-          Select a plan to activate your AI phone agent
+          Select a plan to activate your Ringa receptionist
         </p>
 
         {/* Free Trial Banner */}
@@ -103,7 +103,7 @@ export default function PlansPage() {
                 You&apos;re on a Free Trial — {trialDaysRemaining} days remaining
               </p>
               <p className="text-xs text-amber-700">
-                Activate a plan now to keep your AI agent running after your trial ends.
+                Activate a plan now to keep your Ringa receptionist running after your trial ends.
               </p>
             </div>
           </div>
