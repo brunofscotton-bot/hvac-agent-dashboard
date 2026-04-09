@@ -243,7 +243,7 @@ export default function LandingPage() {
             </div>
             <div className="r-feature">
               <div className="r-feature-icon"><IconZap /></div>
-              <h3>Setup in 10 minutes</h3>
+              <h3>Setup in 5 minutes</h3>
               <p>Add your company, invite your techs, and go live. Technicians connect their calendar with one tap from an SMS link. No IT team needed.</p>
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function LandingPage() {
             <div className="r-step">
               <div className="r-step-num">1</div>
               <div className="r-step-content">
-                <h3>Set up your account</h3>
+                <h3>Set up your account in 5 minutes</h3>
                 <p>Enter your company name, add your technicians, and set working hours. Each tech receives an SMS to connect their Google Calendar with one tap.</p>
               </div>
             </div>
@@ -351,68 +351,59 @@ export default function LandingPage() {
             {/* Starter */}
             <div className="r-price-card">
               <div className="r-plan-name">Starter</div>
-              <div className="r-plan-price"><span>$</span>180</div>
+              <div className="r-plan-price"><span>$</span>99</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> 1 technician</li>
+                <li><span className="r-check">&#10003;</span> Up to 2 technicians</li>
+                <li><span className="r-check">&#10003;</span> 500 minutes/month</li>
                 <li><span className="r-check">&#10003;</span> 24/7 call answering</li>
                 <li><span className="r-check">&#10003;</span> English, Spanish &amp; Portuguese</li>
                 <li><span className="r-check">&#10003;</span> Google Calendar sync</li>
-                <li><span className="r-check">&#10003;</span> Round-robin dispatch</li>
                 <li><span className="r-check">&#10003;</span> SMS confirmations</li>
                 <li><span className="r-check">&#10003;</span> Address verification</li>
                 <li><span className="r-check">&#10003;</span> Emergency triage</li>
-                <li><span className="r-check">&#10003;</span> Jobber integration</li>
-                <li><span className="r-check">&#10003;</span> Analytics dashboard</li>
               </ul>
               <Link href="/signup" className="r-btn-ghost">
-                Get started
+                Start free trial
               </Link>
             </div>
 
-            {/* Professional */}
+            {/* Pro */}
             <div className="r-price-card featured">
-              <div className="r-plan-name">Professional</div>
-              <div className="r-plan-price"><span>$</span>250</div>
+              <div className="r-plan-name">Pro</div>
+              <div className="r-plan-price"><span>$</span>299</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Up to 5 technicians</li>
-                <li><span className="r-check">&#10003;</span> 24/7 call answering</li>
-                <li><span className="r-check">&#10003;</span> English, Spanish &amp; Portuguese</li>
-                <li><span className="r-check">&#10003;</span> Google Calendar sync</li>
-                <li><span className="r-check">&#10003;</span> Round-robin dispatch</li>
-                <li><span className="r-check">&#10003;</span> SMS confirmations</li>
-                <li><span className="r-check">&#10003;</span> Address verification</li>
-                <li><span className="r-check">&#10003;</span> Emergency triage</li>
+                <li><span className="r-check">&#10003;</span> Unlimited technicians</li>
+                <li><span className="r-check">&#10003;</span> 2,000 minutes/month</li>
+                <li><span className="r-check">&#10003;</span> Everything in Starter</li>
                 <li><span className="r-check">&#10003;</span> Jobber integration</li>
-                <li><span className="r-check">&#10003;</span> Analytics dashboard</li>
+                <li><span className="r-check">&#10003;</span> Pricebook &amp; quotes</li>
+                <li><span className="r-check">&#10003;</span> 30-day transcript retention</li>
+                <li><span className="r-check">&#10003;</span> Round-robin dispatch</li>
                 <li><span className="r-check">&#10003;</span> Priority support</li>
               </ul>
               <Link href="/signup" className="r-btn r-btn-lg" style={{ width: "100%", justifyContent: "center" }}>
-                Get started
+                Start free trial
               </Link>
             </div>
 
             {/* Enterprise */}
             <div className="r-price-card">
               <div className="r-plan-name">Enterprise</div>
-              <div className="r-plan-price"><span>$</span>400</div>
+              <div className="r-plan-price" style={{ fontSize: "32px" }}>Custom</div>
               <div className="r-plan-period">per month</div>
               <ul className="r-plan-features">
-                <li><span className="r-check">&#10003;</span> Up to 15 technicians</li>
-                <li><span className="r-check">&#10003;</span> 24/7 call answering</li>
-                <li><span className="r-check">&#10003;</span> English, Spanish &amp; Portuguese</li>
-                <li><span className="r-check">&#10003;</span> Google Calendar sync</li>
-                <li><span className="r-check">&#10003;</span> Round-robin dispatch</li>
-                <li><span className="r-check">&#10003;</span> SMS confirmations</li>
-                <li><span className="r-check">&#10003;</span> Address verification</li>
-                <li><span className="r-check">&#10003;</span> Emergency triage</li>
-                <li><span className="r-check">&#10003;</span> Analytics dashboard</li>
-                <li><span className="r-check">&#10003;</span> Jobber integration</li>
+                <li><span className="r-check">&#10003;</span> Everything in Pro</li>
+                <li><span className="r-check">&#10003;</span> Unlimited call minutes</li>
+                <li><span className="r-check">&#10003;</span> 3-month transcript retention</li>
                 <li><span className="r-check">&#10003;</span> Dedicated account manager</li>
+                <li><span className="r-check">&#10003;</span> Custom AI training</li>
+                <li><span className="r-check">&#10003;</span> SLA guarantee</li>
+                <li><span className="r-check">&#10003;</span> Priority support</li>
               </ul>
-              <Link href="/signup" className="r-btn-ghost">
-                Contact us
+              <Link href="mailto:hello@ringa.ai" className="r-btn-ghost">
+                Contact sales
               </Link>
             </div>
           </div>
@@ -433,7 +424,7 @@ export default function LandingPage() {
               Start your free trial &rarr;
             </Link>
             <p style={{ color: "var(--text-muted)", fontSize: "13px", marginTop: "14px" }}>
-              No credit card required. Live in 10 minutes.
+              No credit card required. Agent active in 5 minutes.
             </p>
           </div>
         </div>

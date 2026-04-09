@@ -264,6 +264,9 @@ export interface Company {
   business_hours_start: number;
   business_hours_end: number;
   call_escalation_enabled?: boolean;
+  escalation_phone?: string;
+  escalation_conditions?: string;
+  call_forwarding_confirmed?: boolean;
   emergency_mode?: string;
   oncall_phone?: string;
   oncall_backup_phone?: string;

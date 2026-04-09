@@ -54,8 +54,10 @@ export default function SettingsPage() {
       name: company.name,
       phone: company.phone,
       address: company.address,
-      twilio_phone_number: company.twilio_phone_number,
+      call_forwarding_confirmed: company.call_forwarding_confirmed,
       call_escalation_enabled: company.call_escalation_enabled,
+      escalation_phone: company.escalation_phone,
+      escalation_conditions: company.escalation_conditions,
       agent_name: company.agent_name,
       greeting_message: company.greeting_message,
       recording_disclosure: company.recording_disclosure,
@@ -271,28 +273,48 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Twilio */}
+        {/* Ringa Phone */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
             <Phone className="h-5 w-5 text-gray-600" />
-            <h2 className="text-lg font-semibold">Phone Number (Twilio)</h2>
+            <h2 className="text-lg font-semibold">Ringa Phone Number</h2>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700">Twilio Phone Number</label>
-            <input
-              value={company.twilio_phone_number ?? ""}
-              onChange={(e) => setCompany({ ...company, twilio_phone_number: e.target.value })}
-              placeholder="+14075551234"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            />
+            <label className="block text-sm font-medium text-gray-700">Your Ringa Number</label>
+            {company.twilio_phone_number ? (
+              <div className="mt-1 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-mono font-semibold text-gray-800">
+                {company.twilio_phone_number}
+                <span className="ml-auto text-xs font-normal text-green-600 font-sans">Active</span>
+              </div>
+            ) : (
+              <div className="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-400">
+                Not yet provisioned — complete onboarding to get your number
+              </div>
+            )}
             <p className="mt-1 text-xs text-gray-400">
-              This is the phone number customers will call. It must be a Twilio number connected to Vapi.
+              This is the number customers call, managed by Ringa. Contact support to change it.
             </p>
+          </div>
+          <div className="mt-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={company.call_forwarding_confirmed ?? false}
+                onChange={(e) => setCompany({ ...company, call_forwarding_confirmed: e.target.checked })}
+                className="mt-0.5 rounded border-gray-300"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Call forwarding is set up</p>
+                <p className="text-xs text-gray-400">
+                  Check this once you&apos;ve configured your carrier to forward unanswered calls to your Ringa number. This dismisses the setup reminder.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
 
         {/* Google Calendar Sync */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div id="google-calendar-sync" className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-gray-600" />
             <h2 className="text-lg font-semibold">Google Calendar Sync</h2>
@@ -369,7 +391,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Jobber Integration */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div id="jobber-integration" className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
             <Link2 className="h-5 w-5 text-gray-600" />
             <h2 className="text-lg font-semibold">Jobber Integration</h2>
@@ -478,7 +500,7 @@ export default function SettingsPage() {
             <h2 className="text-lg font-semibold">Call Escalation</h2>
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Allow the AI agent to transfer calls to a live technician when the customer requests to speak with a real person.
+            Transfer calls to a live person when the AI determines the customer genuinely needs human assistance — complex situations, complaints, or customers who are clearly frustrated.
           </p>
           <div className="mt-4 flex items-center gap-3">
             <button
@@ -497,8 +519,34 @@ export default function SettingsPage() {
               {company.call_escalation_enabled ? "Enabled" : "Disabled"}
             </span>
           </div>
-          <p className="mt-2 text-xs text-gray-400">
-            When enabled, customers can say &quot;speak to someone&quot; / &quot;falar com alguém&quot; / &quot;hablar con alguien&quot; to be transferred to an available technician.
+
+          {company.call_escalation_enabled && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Transfer to (phone number)</label>
+                <input
+                  value={company.escalation_phone ?? ""}
+                  onChange={(e) => setCompany({ ...company, escalation_phone: e.target.value })}
+                  placeholder="+14075551234"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                />
+                <p className="mt-1 text-xs text-gray-400">The phone number the AI will transfer to when escalating</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Escalation conditions (optional)</label>
+                <textarea
+                  value={company.escalation_conditions ?? ""}
+                  onChange={(e) => setCompany({ ...company, escalation_conditions: e.target.value })}
+                  rows={3}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  placeholder="e.g. Transfer when customer mentions a warranty issue, commercial job, or has a complaint about a previous visit"
+                />
+                <p className="mt-1 text-xs text-gray-400">Describe specific situations that should trigger a transfer. Leave blank for the default behavior.</p>
+              </div>
+            </div>
+          )}
+
+          <p className="mt-3 text-xs text-gray-400">
             Changes take effect after saving and will update your AI assistant.
           </p>
         </div>
@@ -508,18 +556,18 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold">Integration Status</h2>
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Vapi.ai (AI Agent)</span>
+              <span className="text-sm text-gray-600">Ringa AI Agent</span>
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.vapi_assistant_id ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                {company.vapi_assistant_id ? "Connected" : "Not Provisioned"}
+                {company.vapi_assistant_id ? "Active" : "Not Provisioned"}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Twilio (Phone & SMS)</span>
+              <span className="text-sm text-gray-600">Ringa Phone</span>
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.twilio_phone_number ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                {company.twilio_phone_number ? "Connected" : "Not Configured"}
+                {company.twilio_phone_number ? company.twilio_phone_number : "Not Configured"}
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <a href="#google-calendar-sync" className="flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1 transition-colors">
               <span className="text-sm text-gray-600">Google Calendar</span>
               {(() => {
                 const calTechs = technicians.filter(t => t.is_active && t.calendar_provider === "google");
@@ -530,13 +578,13 @@ export default function SettingsPage() {
                   </span>
                 );
               })()}
-            </div>
-            <div className="flex items-center justify-between">
+            </a>
+            <a href="#jobber-integration" className="flex items-center justify-between hover:bg-gray-50 rounded px-1 -mx-1 transition-colors">
               <span className="text-sm text-gray-600">Jobber</span>
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${jobberConnected ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                 {jobberConnected ? "Connected" : "Not Connected"}
               </span>
-            </div>
+            </a>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Onboarding</span>
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${company.onboarding_completed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>

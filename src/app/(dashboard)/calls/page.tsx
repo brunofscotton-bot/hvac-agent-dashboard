@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Phone, Clock, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import { getRecentCalls, type CallLog } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
 const outcomeColors: Record<string, string> = {
   appointment_booked: "bg-green-100 text-green-700",
@@ -53,10 +54,19 @@ function TranscriptLine({ line }: { line: string }) {
   return <p className="py-0.5 text-gray-700">{line}</p>;
 }
 
+const TRANSCRIPT_RETENTION: Record<string, { days: number; label: string }> = {
+  starter: { days: 15, label: "15 days" },
+  pro: { days: 30, label: "30 days" },
+  enterprise: { days: 90, label: "3 months" },
+};
+
 export default function CallsPage() {
+  const { company } = useAuth();
   const [calls, setCalls] = useState<CallLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const retention = TRANSCRIPT_RETENTION[company?.subscription_plan ?? "starter"] ?? TRANSCRIPT_RETENTION.starter;
 
   useEffect(() => {
     getRecentCalls(50)
@@ -183,7 +193,7 @@ export default function CallsPage() {
                         <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="text-sm font-medium text-gray-700">Transcript</h4>
-                            <span className="text-xs text-gray-400">Transcript expires after 15 days</span>
+                            <span className="text-xs text-gray-400">Transcripts retained for {retention.label}</span>
                           </div>
                           {call.transcript ? (
                             <div className="max-h-80 overflow-y-auto rounded-md bg-white border border-gray-200 p-4 text-sm leading-relaxed">

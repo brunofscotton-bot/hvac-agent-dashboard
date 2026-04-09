@@ -22,6 +22,7 @@ interface Company {
   fee_applies_to_service: boolean;
   business_hours_start: number;
   business_hours_end: number;
+  call_forwarding_confirmed?: boolean;
 }
 
 interface AuthContextType {

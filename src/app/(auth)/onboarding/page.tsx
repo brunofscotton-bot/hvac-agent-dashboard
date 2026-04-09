@@ -225,20 +225,20 @@ export default function OnboardingPage() {
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm font-semibold text-amber-800">Ring Time Guide</p>
                 <p className="mt-1 text-xs text-amber-700">
-                  The codes above use 10-second forwarding (~2-3 rings). This is recommended so Ringa picks up quickly.
+                  The codes above use 10-second forwarding (~2–3 rings) — the sweet spot so Ringa picks up quickly without cutting off your chance to answer first.
                 </p>
-                <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-lg bg-white p-2 shadow-sm">
-                    <p className="text-lg font-bold text-amber-800">5s</p>
-                    <p className="text-amber-600">~1 ring</p>
+                    <p className="text-base font-bold text-amber-800">5s</p>
+                    <p className="text-[10px] text-amber-600">~1 ring</p>
                   </div>
                   <div className="rounded-lg bg-white p-2 shadow-sm ring-2 ring-amber-400">
-                    <p className="text-lg font-bold text-amber-800">10s</p>
-                    <p className="text-amber-600">Recommended</p>
+                    <p className="text-base font-bold text-amber-800">10s</p>
+                    <p className="text-[10px] leading-tight text-amber-600">✓ Best</p>
                   </div>
                   <div className="rounded-lg bg-white p-2 shadow-sm">
-                    <p className="text-lg font-bold text-amber-800">15s</p>
-                    <p className="text-amber-600">~4 rings</p>
+                    <p className="text-base font-bold text-amber-800">15s</p>
+                    <p className="text-[10px] text-amber-600">~4 rings</p>
                   </div>
                 </div>
               </div>
@@ -456,21 +456,9 @@ export default function OnboardingPage() {
                 </select>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Service Area Zip Codes</label>
-              <textarea
-                value={form.service_area_zip_codes}
-                onChange={(e) => updateForm("service_area_zip_codes", e.target.value)}
-                rows={2}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder="32801, 32803, 34786"
-              />
-              <p className="mt-1 text-xs text-gray-400">
-                Enter zip codes your company serves (e.g., 32801, 32803, 34786). Leave empty to serve all areas.
-              </p>
-            </div>
             <p className="text-xs text-gray-400">
-              Your AI phone number will be a local number for {form.city || "your city"}, {form.state || "your state"}.
+              Your Ringa phone number will be a local number for {form.city || "your city"}, {form.state || "your state"}.
+              You can configure service area zip codes in Settings after setup.
             </p>
           </div>
         )}
@@ -636,7 +624,6 @@ export default function OnboardingPage() {
                   >
                     <option value="none">No Calendar Sync</option>
                     <option value="google">Google Calendar</option>
-                    <option value="microsoft">Microsoft Outlook</option>
                   </select>
                   {tech.calendar_provider === "google" && (
                     <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
@@ -810,7 +797,7 @@ export default function OnboardingPage() {
                 <h3 className="text-sm font-semibold text-gray-700">Company</h3>
                 <p className="mt-1 text-sm">{form.company_name}</p>
                 <p className="text-xs text-gray-500">
-                  {form.city}, {form.state} — local number will be purchased
+                  {form.city}, {form.state} — Ringa AI assistant will be activated
                 </p>
               </div>
 
@@ -859,9 +846,9 @@ export default function OnboardingPage() {
                 Clicking &ldquo;Launch Agent&rdquo; will:
               </p>
               <ul className="mt-2 space-y-1 text-sm text-[#3B6FFF]">
-                <li>1. Purchase a local phone number for {form.city}, {form.state}</li>
-                <li>2. Create your custom AI assistant</li>
-                <li>3. Connect the phone number to your agent</li>
+                <li>1. Activate your Ringa assistant with a phone number from {form.city}, {form.state}</li>
+                <li>2. Create your custom AI agent with the settings above</li>
+                <li>3. Connect everything so you can start receiving calls</li>
               </ul>
             </div>
           </div>

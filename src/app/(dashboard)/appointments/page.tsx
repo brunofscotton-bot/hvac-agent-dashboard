@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Calendar, Search, Filter } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { getAppointments, type Appointment, type PaginatedResponse } from "@/lib/api";
 
 const statusColors: Record<string, string> = {
@@ -21,6 +21,13 @@ const urgencyColors: Record<string, string> = {
   emergency: "text-red-600 font-bold",
 };
 
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+function formatTime(d: string) {
+  return new Date(d).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
 export default function AppointmentsPage() {
   const [data, setData] = useState<PaginatedResponse<Appointment> | null>(null);
   const [statusFilter, setStatusFilter] = useState("");
@@ -38,6 +45,8 @@ export default function AppointmentsPage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [page, statusFilter]);
+
+  const items = data?.items ?? [];
 
   return (
     <div>
@@ -64,8 +73,49 @@ export default function AppointmentsPage() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      {/* Mobile cards */}
+      <div className="mt-4 block sm:hidden space-y-3">
+        {loading ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-400">Loading...</div>
+        ) : items.length === 0 ? (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-400">
+            No appointments found
+          </div>
+        ) : (
+          items.map((appt) => (
+            <Link
+              key={appt.id}
+              href={`/appointments/${appt.id}`}
+              className="block rounded-lg border border-gray-200 bg-white p-4 hover:bg-gray-50"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold truncate">{appt.customer?.name ?? "Unknown"}</p>
+                  <p className="text-sm text-gray-500 truncate">{appt.problem_description}</p>
+                  <p className="mt-1 text-xs text-gray-400 truncate">{appt.customer?.address}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-semibold text-[#3B6FFF]">{formatDate(appt.scheduled_date)}</p>
+                  <p className="text-xs text-gray-500">{formatTime(appt.scheduled_date)}</p>
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[appt.status] ?? ""}`}>
+                  {appt.status}
+                </span>
+                <span className={`text-xs ${urgencyColors[appt.urgency] ?? ""}`}>{appt.urgency}</span>
+                <span className="ml-auto text-xs text-gray-500">
+                  {appt.technician?.name ?? "Unassigned"} &middot; ${appt.visit_fee}
+                  {appt.is_after_hours && <span className="ml-1 text-orange-500">AH</span>}
+                </span>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="mt-4 hidden sm:block overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="min-w-[700px] w-full text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50">
             <tr>
@@ -81,29 +131,18 @@ export default function AppointmentsPage() {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  Loading...
-                </td>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td>
               </tr>
-            ) : (data?.items ?? []).length === 0 ? (
+            ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  No appointments found
-                </td>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">No appointments found</td>
               </tr>
             ) : (
-              data?.items.map((appt) => (
+              items.map((appt) => (
                 <tr key={appt.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <Link href={`/appointments/${appt.id}`} className="text-blue-600 hover:underline">
-                      {new Date(appt.scheduled_date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}{" "}
-                      {new Date(appt.scheduled_date).toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
+                      {formatDate(appt.scheduled_date)}{" "}{formatTime(appt.scheduled_date)}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
@@ -139,7 +178,7 @@ export default function AppointmentsPage() {
       {data && data.total > data.per_page && (
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-500">
-            Showing {(page - 1) * data.per_page + 1}-{Math.min(page * data.per_page, data.total)} of {data.total}
+            Showing {(page - 1) * data.per_page + 1}–{Math.min(page * data.per_page, data.total)} of {data.total}
           </p>
           <div className="flex gap-2">
             <button
