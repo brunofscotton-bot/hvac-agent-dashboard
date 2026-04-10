@@ -30,13 +30,17 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl text-center">
-        <div className="text-4xl mb-4">📱</div>
-        <h1 className="text-xl font-bold text-white">Check your phone</h1>
+        <div className="text-4xl mb-4">📬</div>
+        <h1 className="text-xl font-bold text-white">Check your inbox</h1>
         <p className="mt-2 text-sm text-gray-400">
-          If an account with that email exists, we&apos;ve sent a password reset link via SMS to the phone number on file.
+          If an account with that email exists, we&apos;ve sent a password reset link to{" "}
+          <span className="font-medium text-white">{email}</span>.
+        </p>
+        <p className="mt-3 text-sm text-gray-400">
+          We also sent it via SMS to the phone number on file as a backup.
         </p>
         <p className="mt-4 text-xs text-gray-500">
-          The link expires in 1 hour. Didn&apos;t receive it? Make sure your phone number is correct in your account settings.
+          The link expires in 1 hour. Didn&apos;t receive it? Check your spam folder or make sure your account details are correct.
         </p>
         <Link
           href="/login"
@@ -53,7 +57,7 @@ export default function ForgotPasswordPage() {
     <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
       <h1 className="text-xl font-bold text-white">Reset your password</h1>
       <p className="mt-1 text-sm text-gray-400">
-        Enter your email and we&apos;ll send a reset link to your phone
+        Enter your email and we&apos;ll send you a reset link
       </p>
 
       {error && (
