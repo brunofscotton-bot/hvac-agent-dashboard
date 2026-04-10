@@ -24,18 +24,42 @@ import { useAuth } from "@/lib/auth";
 
 const ADMIN_EMAILS = ["bruno.f.scotton@gmail.com"];
 
-const navItems = [
-  { href: "/home", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/appointments", label: "Appointments", icon: Calendar },
-  { href: "/technicians", label: "Technicians", icon: Users },
-  { href: "/pricebook", label: "Pricebook", icon: BookOpen },
-  { href: "/customers", label: "Customers", icon: UserCircle },
-  { href: "/pricing", label: "Pricing", icon: DollarSign },
-  { href: "/calls", label: "Call History", icon: Phone },
-  { href: "/reviews", label: "Reviews", icon: Star },
-  { href: "/campaigns", label: "Campaigns", icon: Megaphone },
-  { href: "/billing", label: "Billing", icon: CreditCard },
-  { href: "/settings", label: "Settings", icon: Settings },
+type NavItem = { href: string; label: string; icon: any };
+type NavGroup = { label: string; items: NavItem[] };
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [{ href: "/home", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
+    label: "Operations",
+    items: [
+      { href: "/appointments", label: "Appointments", icon: Calendar },
+      { href: "/calls", label: "Call History", icon: Phone },
+      { href: "/technicians", label: "Technicians", icon: Users },
+    ],
+  },
+  {
+    label: "Customers",
+    items: [
+      { href: "/customers", label: "Customers", icon: UserCircle },
+      { href: "/reviews", label: "Reviews", icon: Star },
+      { href: "/campaigns", label: "Campaigns", icon: Megaphone },
+    ],
+  },
+  {
+    label: "Business",
+    items: [
+      { href: "/pricebook", label: "Pricebook", icon: BookOpen },
+      { href: "/pricing", label: "Service Fees", icon: DollarSign },
+      { href: "/billing", label: "Billing", icon: CreditCard },
+    ],
+  },
+  {
+    label: "Account",
+    items: [{ href: "/settings", label: "Settings", icon: Settings }],
+  },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -56,45 +80,56 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </svg>
         <span className="text-lg font-bold text-gray-900">ringa</span>
       </div>
-      <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/home" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-[#3B6FFF]/10 text-[#3B6FFF]"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="mt-4 flex flex-1 flex-col gap-5 px-3 overflow-y-auto">
+        {navGroups.map((group) => (
+          <div key={group.label}>
+            <div className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+              {group.label}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/home" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-[#3B6FFF]/10 text-[#3B6FFF]"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         {/* Admin link — only for platform owner */}
         {company && ADMIN_EMAILS.includes(company.email) && (
-          <>
-            <div className="mx-3 my-2 border-t border-gray-200" />
+          <div>
+            <div className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-purple-500">
+              Platform
+            </div>
             <Link
               href="/admin"
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 pathname.startsWith("/admin")
                   ? "bg-[#7C3FFF]/10 text-[#7C3FFF]"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              <Shield className="h-5 w-5" />
+              <Shield className="h-4 w-4" />
               Admin Panel
             </Link>
-          </>
+          </div>
         )}
       </nav>
 

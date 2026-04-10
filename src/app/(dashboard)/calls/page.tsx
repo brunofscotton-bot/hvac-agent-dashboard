@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, Clock, Globe, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, Clock, Globe, ChevronDown, ChevronUp, PhoneOff } from "lucide-react";
 import { getRecentCalls, type CallLog, type PaginatedResponse } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { EmptyState, SkeletonRows } from "@/components/empty-state";
 
 const outcomeColors: Record<string, string> = {
   appointment_booked: "bg-green-100 text-green-700",
@@ -111,12 +112,20 @@ export default function CallsPage() {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                <td colSpan={7} className="p-4">
+                  <SkeletonRows count={5} />
+                </td>
               </tr>
             ) : calls.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                  No calls recorded yet. Calls will appear here once your Ringa receptionist starts handling calls.
+                <td colSpan={7}>
+                  <EmptyState
+                    icon={PhoneOff}
+                    title="No calls yet"
+                    description="Calls will appear here once your Ringa receptionist starts handling them. Make sure call forwarding is set up on your business number."
+                    actionLabel="Setup call forwarding"
+                    actionHref="/settings"
+                  />
                 </td>
               </tr>
             ) : (

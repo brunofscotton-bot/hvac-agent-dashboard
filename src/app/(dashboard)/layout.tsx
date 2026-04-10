@@ -1,10 +1,40 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Sidebar } from "@/components/sidebar";
 import { updateCompany } from "@/lib/api";
 import { useState } from "react";
+
+/* Mobile-only top bar with the current page title.
+   The sidebar hamburger already sits top-left, so this bar starts
+   at left-16 to avoid overlap. */
+const PAGE_TITLES: Record<string, string> = {
+  "/home": "Dashboard",
+  "/appointments": "Appointments",
+  "/calls": "Call History",
+  "/technicians": "Technicians",
+  "/customers": "Customers",
+  "/reviews": "Reviews",
+  "/campaigns": "Campaigns",
+  "/pricebook": "Pricebook",
+  "/pricing": "Service Fees",
+  "/billing": "Billing",
+  "/settings": "Settings",
+  "/admin": "Admin Panel",
+};
+
+function MobileTopBar() {
+  const pathname = usePathname();
+  const base = "/" + (pathname?.split("/")[1] || "");
+  const title = PAGE_TITLES[base] || PAGE_TITLES[pathname || ""] || "Ringa";
+  return (
+    <div className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center justify-center border-b border-gray-200 bg-white/95 backdrop-blur-md md:hidden">
+      <h1 className="text-sm font-semibold text-gray-900">{title}</h1>
+    </div>
+  );
+}
 
 function CallForwardingBanner({ onDismiss }: { onDismiss: () => void }) {
   const [confirming, setConfirming] = useState(false);
@@ -66,6 +96,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen">
       <Sidebar />
+      <MobileTopBar />
       <main className={`flex-1 flex flex-col p-4 pt-16 md:p-8 md:pt-8 ${showBanner ? "pt-24 md:pt-20" : ""}`}>
         {showBanner && (
           <CallForwardingBanner

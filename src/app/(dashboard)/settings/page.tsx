@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const [smsSent, setSmsSent] = useState<Set<string>>(new Set());
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [tab, setTab] = useState<"company" | "agent" | "integrations" | "reviews">("company");
   const [syncingSchedules, setSyncingSchedules] = useState(false);
   const [scheduleSyncResult, setScheduleSyncResult] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -83,12 +84,37 @@ export default function SettingsPage() {
     return <div className="flex h-64 items-center justify-center text-gray-400">No company configured</div>;
   }
 
+  const tabs = [
+    { id: "company", label: "Company", icon: Building },
+    { id: "agent", label: "Agent & Calls", icon: PhoneForwarded },
+    { id: "integrations", label: "Integrations", icon: Link2 },
+    { id: "reviews", label: "Reviews", icon: MessageSquare },
+  ] as const;
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Settings</h1>
-      <p className="mt-1 text-gray-500">Manage your company information</p>
+      <p className="mt-1 text-gray-500">Manage your company and integrations</p>
 
-      <div className="mt-6 w-full max-w-xl space-y-8">
+      {/* Tab bar */}
+      <div className="mt-6 flex gap-1 overflow-x-auto border-b border-gray-200">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`flex items-center gap-2 whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              tab === t.id
+                ? "border-[#3B6FFF] text-[#3B6FFF]"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <t.icon className="h-4 w-4" />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "company" ? "block" : "hidden"}`}>
         {/* Company Info */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -192,7 +218,10 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
+      </div>
 
+      {/* ══ AGENT & CALLS TAB ═════════════════════════════════════════ */}
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "agent" ? "block" : "hidden"}`}>
         {/* Emergency / After-Hours */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -275,7 +304,10 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+      </div>
 
+      {/* ══ INTEGRATIONS TAB ═══════════════════════════════════════════ */}
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "integrations" ? "block" : "hidden"}`}>
         {/* Ringa Phone */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -393,6 +425,9 @@ export default function SettingsPage() {
           </p>
         </div>
 
+        {/* END INTEGRATIONS temp close for Reviews */}
+      </div>
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "reviews" ? "block" : "hidden"}`}>
         {/* Google Reviews */}
         <div id="reviews" className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -448,6 +483,9 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* END REVIEWS temp close, reopen Integrations for Jobber */}
+      </div>
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "integrations" ? "block" : "hidden"}`}>
         {/* Jobber Integration */}
         <div id="jobber-integration" className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -551,6 +589,9 @@ export default function SettingsPage() {
           )}
         </div>
 
+        {/* END INTEGRATIONS temp close, reopen Agent for Call Escalation */}
+      </div>
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "agent" ? "block" : "hidden"}`}>
         {/* Call Escalation */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <div className="flex items-center gap-2">
@@ -609,6 +650,9 @@ export default function SettingsPage() {
           </p>
         </div>
 
+        {/* END AGENT close, reopen Integrations for status */}
+      </div>
+      <div className={`mt-6 w-full max-w-xl space-y-8 ${tab === "integrations" ? "block" : "hidden"}`}>
         {/* Integration Status */}
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="text-lg font-semibold">Integration Status</h2>
@@ -651,14 +695,17 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Save button — sticky across all tabs */}
+      <div className="sticky bottom-0 mt-6 w-full max-w-xl border-t border-gray-100 bg-white/90 backdrop-blur-sm pt-4 pb-2">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-[#3B6FFF] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#2D5FE6] disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
-          {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
+          {saving ? "Saving..." : saved ? "✓ Saved" : "Save Changes"}
         </button>
       </div>
     </div>
