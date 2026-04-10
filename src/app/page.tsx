@@ -131,6 +131,24 @@ export default function LandingPage() {
             </ScrollButton>
           </div>
 
+          {/* Trust chip */}
+          <div className="r-trust-chip">
+            <span className="r-trust-item">
+              <span className="r-trust-check">✓</span>
+              {t("hero_trust_1")}
+            </span>
+            <span className="r-trust-dot" />
+            <span className="r-trust-item">
+              <span className="r-trust-check">✓</span>
+              {t("hero_trust_2")}
+            </span>
+            <span className="r-trust-dot" />
+            <span className="r-trust-item">
+              <span className="r-trust-check">✓</span>
+              {t("hero_trust_3")}
+            </span>
+          </div>
+
           {/* Live Call Demo */}
           <div className="r-demo">
             <div className="r-call-card">
@@ -230,6 +248,25 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* WHY HVAC */}
+        <section className="r-section r-why-section" style={{ borderTop: "1px solid var(--border)" }}>
+          <div className="r-section-label">{t("why_label")}</div>
+          <h2 className="r-section-title">
+            {t("why_title_1")}<br />{t("why_title_2")}
+          </h2>
+          <p className="r-section-sub">{t("why_sub")}</p>
+
+          <div className="r-why-grid">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="r-why-card">
+                <div className="r-why-num">0{n}</div>
+                <h3>{t(`why${n}_title`)}</h3>
+                <p>{t(`why${n}_desc`)}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* HOW IT WORKS */}
         <section className="r-section" id="how" style={{ borderTop: "1px solid var(--border)" }}>
           <div className="r-section-label">{t("how_label")}</div>
@@ -299,6 +336,47 @@ export default function LandingPage() {
               <span>&#10003;</span>
               Agendado &middot; Amanh&atilde; 8:00 &middot; Marco designado
             </div>
+          </div>
+        </section>
+
+        {/* COMPARISON TABLE */}
+        <section className="r-section" style={{ borderTop: "1px solid var(--border)" }}>
+          <div className="r-section-label">{t("cmp_label")}</div>
+          <h2 className="r-section-title">
+            {t("cmp_title_1")}<br />{t("cmp_title_2")}
+          </h2>
+          <p className="r-section-sub">{t("cmp_sub")}</p>
+
+          <div className="r-compare-wrap">
+            <table className="r-compare">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>{t("cmp_col_voicemail")}</th>
+                  <th>{t("cmp_col_service")}</th>
+                  <th>{t("cmp_col_human")}</th>
+                  <th className="r-compare-highlight">{t("cmp_col_ringa")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { row: "available", v: "v_available", s: "s_available", h: "h_available", r: "r_available" },
+                  { row: "languages", v: "v_languages", s: "s_languages", h: "h_languages", r: "r_languages" },
+                  { row: "books", v: "v_books", s: "s_books", h: "h_books", r: "r_books" },
+                  { row: "dispatches", v: "v_dispatches", s: "s_dispatches", h: "h_dispatches", r: "r_dispatches" },
+                  { row: "setup", v: "v_setup", s: "s_setup", h: "h_setup", r: "r_setup" },
+                  { row: "price", v: "v_price", s: "s_price", h: "h_price", r: "r_price" },
+                ].map(({ row, v, s, h, r }) => (
+                  <tr key={row}>
+                    <th scope="row">{t(`cmp_row_${row}`)}</th>
+                    <td className="r-compare-muted">{t(`cmp_${v}`)}</td>
+                    <td className="r-compare-muted">{t(`cmp_${s}`)}</td>
+                    <td className="r-compare-muted">{t(`cmp_${h}`)}</td>
+                    <td className="r-compare-highlight">{t(`cmp_${r}`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
