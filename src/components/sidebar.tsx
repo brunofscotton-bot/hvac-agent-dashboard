@@ -18,6 +18,7 @@ import {
   Shield,
   BookOpen,
   Star,
+  Megaphone,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -32,6 +33,7 @@ const navItems = [
   { href: "/pricing", label: "Pricing", icon: DollarSign },
   { href: "/calls", label: "Call History", icon: Phone },
   { href: "/reviews", label: "Reviews", icon: Star },
+  { href: "/campaigns", label: "Campaigns", icon: Megaphone },
   { href: "/billing", label: "Billing", icon: CreditCard },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

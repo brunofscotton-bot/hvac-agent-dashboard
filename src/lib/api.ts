@@ -171,6 +171,73 @@ export interface LeadSourceStats {
 }
 export const getLeadSourceStats = () => fetchAPI<LeadSourceStats>("/admin/lead-sources");
 
+// ── Campaigns ─────────────────────────────────────────────────────────────
+export interface CampaignTemplate {
+  key: string;
+  name: string;
+  recommended_months: number[];
+  region: string;
+  inactive_days: number;
+  equipment_types: string;
+  offer_text: string;
+  offer_price: number;
+  sms_template: string;
+  recommended: boolean;
+}
+export interface Campaign {
+  id: string;
+  name: string;
+  template_key?: string;
+  status: "draft" | "active" | "paused" | "completed";
+  inactive_days: number;
+  equipment_types?: string;
+  offer_text: string;
+  offer_price?: number;
+  sms_template: string;
+  max_contacts_per_day: number;
+  send_start_hour: number;
+  send_end_hour: number;
+  send_weekends: boolean;
+  target_count: number;
+  sent_count: number;
+  responded_count: number;
+  booked_count: number;
+  declined_count: number;
+  launched_at?: string;
+  created_at: string;
+}
+export interface CampaignContact {
+  id: string;
+  customer_name: string | null;
+  customer_phone: string | null;
+  status: string;
+  sms_sent_at: string | null;
+  sms_response: string | null;
+  sms_response_at: string | null;
+}
+export interface CampaignDetail extends Campaign {
+  contacts: CampaignContact[];
+}
+
+export const getCampaignTemplates = () => fetchAPI<CampaignTemplate[]>("/campaigns/templates");
+export const getCampaigns = () => fetchAPI<Campaign[]>("/campaigns");
+export const previewCampaign = (data: { inactive_days: number; equipment_types?: string }) =>
+  fetchAPI<{ eligible_count: number }>("/campaigns/preview", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+export const createCampaign = (data: Partial<Campaign>) =>
+  fetchAPI<Campaign>("/campaigns", { method: "POST", body: JSON.stringify(data) });
+export const getCampaign = (id: string) => fetchAPI<CampaignDetail>(`/campaigns/${id}`);
+export const launchCampaign = (id: string) =>
+  fetchAPI<Campaign>(`/campaigns/${id}/launch`, { method: "POST" });
+export const pauseCampaign = (id: string) =>
+  fetchAPI<{ status: string }>(`/campaigns/${id}/pause`, { method: "POST" });
+export const resumeCampaign = (id: string) =>
+  fetchAPI<{ status: string }>(`/campaigns/${id}/resume`, { method: "POST" });
+export const deleteCampaign = (id: string) =>
+  fetchAPI(`/campaigns/${id}`, { method: "DELETE" });
+
 // Google Calendar
 export const sendCalendarInstructions = (techId: string) =>
   fetchAPI<{ success: boolean; message_sid: string }>(`/technicians/${techId}/send-calendar-instructions`, { method: "POST" });
