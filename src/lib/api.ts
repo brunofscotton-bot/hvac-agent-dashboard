@@ -275,10 +275,14 @@ export interface DashboardStats {
   week_appointments: number;
   month_calls: number;
   month_bookings: number;
+  month_saved_calls?: number;
+  today_revenue?: number;
+  week_revenue?: number;
   month_revenue: number;
+  prev_month_revenue?: number;
+  revenue_trend_pct?: number | null;
   conversion_rate: number;
   callbacks_pending?: number;
-  week_revenue?: number;
 }
 
 export interface Appointment {
