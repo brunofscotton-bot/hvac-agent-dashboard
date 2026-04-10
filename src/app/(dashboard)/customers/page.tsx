@@ -26,6 +26,7 @@ import {
   type CustomerDetail,
   type CustomerStats,
 } from "@/lib/api";
+import { EmptyState, SkeletonRows } from "@/components/empty-state";
 
 const LANGUAGE_LABELS: Record<string, string> = {
   en: "English",
@@ -348,11 +349,25 @@ export default function CustomersPage() {
       {/* Customer Table */}
       <div className="mt-6 overflow-x-auto rounded-lg border border-gray-200 bg-white">
         {loading ? (
-          <div className="py-12 text-center text-gray-400">Loading...</div>
-        ) : customers.length === 0 ? (
-          <div className="py-12 text-center text-gray-400">
-            {search ? "No customers match your search." : "No customers yet. Add your first one above."}
+          <div className="p-4">
+            <SkeletonRows count={5} />
           </div>
+        ) : customers.length === 0 ? (
+          search ? (
+            <EmptyState
+              icon={Users}
+              title="No customers match your search"
+              description="Try a different name or phone number."
+            />
+          ) : (
+            <EmptyState
+              icon={Users}
+              title="No customers yet"
+              description="Customers created by Ringa from calls will appear here"
+              actionLabel="View call history"
+              actionHref="/calls"
+            />
+          )
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">

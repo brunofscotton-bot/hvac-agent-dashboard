@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Megaphone, Plus, Play, Pause, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { getCampaigns, type Campaign } from "@/lib/api";
+import { SkeletonRows } from "@/components/empty-state";
 
 const statusConfig: Record<Campaign["status"], { bg: string; text: string; label: string; icon: any }> = {
   draft: { bg: "bg-gray-100", text: "text-gray-700", label: "Draft", icon: Clock },
@@ -76,7 +77,7 @@ export default function CampaignsPage() {
       {/* Campaigns list */}
       <div className="mt-6 space-y-3">
         {loading ? (
-          <div className="py-12 text-center text-gray-400">Loading campaigns...</div>
+          <SkeletonRows count={3} />
         ) : campaigns.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
             <Megaphone className="mx-auto h-10 w-10 text-gray-300" />

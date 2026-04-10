@@ -31,6 +31,8 @@ import {
   type TimeOffBlock,
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { EmptyState, SkeletonRows } from "@/components/empty-state";
+import { Users } from "lucide-react";
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -258,10 +260,16 @@ export default function TechniciansPage() {
       {/* Technician List */}
       <div className="mt-6 space-y-3">
         {loading ? (
-          <div className="py-8 text-center text-gray-400">Loading...</div>
+          <SkeletonRows count={4} />
         ) : technicians.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-400">
-            No technicians yet. Add your first one above.
+          <div className="rounded-lg border border-gray-200 bg-white">
+            <EmptyState
+              icon={Users}
+              title="No technicians added yet"
+              description="Add your team so Ringa can dispatch them to jobs"
+              actionLabel="Add technician"
+              onAction={() => { resetForm(); setShowForm(true); }}
+            />
           </div>
         ) : (
           technicians.map((tech) => (
@@ -373,7 +381,11 @@ function SchedulePanel({ technicianId }: { technicianId: string }) {
   };
 
   if (loading) {
-    return <div className="border-t border-gray-200 p-4 text-center text-sm text-gray-400">Loading schedule...</div>;
+    return (
+      <div className="border-t border-gray-200 p-4">
+        <SkeletonRows count={3} />
+      </div>
+    );
   }
 
   return (

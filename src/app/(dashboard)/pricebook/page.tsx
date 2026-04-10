@@ -24,6 +24,7 @@ import {
   type PricebookCategory,
   type PricebookItem,
 } from "@/lib/api";
+import { SkeletonRows } from "@/components/empty-state";
 
 const EMPTY_ITEM: Partial<PricebookItem> = {
   name: "",
@@ -150,7 +151,11 @@ export default function PricebookPage() {
   };
 
   if (loading) {
-    return <div className="flex h-64 items-center justify-center text-gray-400">Loading...</div>;
+    return (
+      <div className="mt-6">
+        <SkeletonRows count={5} />
+      </div>
+    );
   }
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Star, AlertCircle, CheckCircle, Clock, ExternalLink } from "lucide-react";
 import { getReviews, resolveReview, type ReviewItem } from "@/lib/api";
+import { EmptyState, SkeletonRows } from "@/components/empty-state";
 
 function StarDisplay({ rating }: { rating: number | null }) {
   if (rating == null) return <span className="text-xs text-gray-400">No rating yet</span>;
@@ -117,10 +118,14 @@ export default function ReviewsPage() {
       {/* List */}
       <div className="mt-4 space-y-3">
         {loading ? (
-          <div className="py-12 text-center text-gray-400">Loading...</div>
+          <SkeletonRows count={5} />
         ) : filtered.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center text-gray-400">
-            No reviews in this filter yet.
+          <div className="rounded-lg border border-gray-200 bg-white">
+            <EmptyState
+              icon={Star}
+              title="No reviews yet"
+              description="Reviews will appear here after appointments are marked completed and customers receive their review link SMS"
+            />
           </div>
         ) : (
           filtered.map((review) => (

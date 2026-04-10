@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { getAppointments, type Appointment, type PaginatedResponse } from "@/lib/api";
+import { EmptyState, SkeletonRows } from "@/components/empty-state";
 
 const statusColors: Record<string, string> = {
   scheduled: "bg-blue-100 text-blue-700",
@@ -76,10 +77,16 @@ export default function AppointmentsPage() {
       {/* Mobile cards */}
       <div className="mt-4 block sm:hidden space-y-3">
         {loading ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-400">Loading...</div>
+          <SkeletonRows count={5} />
         ) : items.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-400">
-            No appointments found
+          <div className="rounded-lg border border-gray-200 bg-white">
+            <EmptyState
+              icon={Calendar}
+              title="No appointments scheduled"
+              description="When Ringa books a job it will appear here"
+              actionLabel="View call history"
+              actionHref="/calls"
+            />
           </div>
         ) : (
           items.map((appt) => (
@@ -131,11 +138,21 @@ export default function AppointmentsPage() {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                <td colSpan={7} className="px-4 py-4">
+                  <SkeletonRows count={5} />
+                </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">No appointments found</td>
+                <td colSpan={7}>
+                  <EmptyState
+                    icon={Calendar}
+                    title="No appointments scheduled"
+                    description="When Ringa books a job it will appear here"
+                    actionLabel="View call history"
+                    actionHref="/calls"
+                  />
+                </td>
               </tr>
             ) : (
               items.map((appt) => (
