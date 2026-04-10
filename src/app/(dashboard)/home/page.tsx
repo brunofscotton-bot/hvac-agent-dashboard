@@ -1,20 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, Phone, DollarSign, TrendingUp, Clock, MapPin, PhoneForwarded } from "lucide-react";
+import { Calendar, Phone, DollarSign, TrendingUp, Clock, MapPin, PhoneForwarded, TrendingUp as Trending } from "lucide-react";
 import { StatCard } from "@/components/stat-card";
-import { getDashboardStats, getTodayAppointments, type DashboardStats, type Appointment } from "@/lib/api";
+import { getDashboardStats, getTodayAppointments, getLeadSourceStats, type DashboardStats, type Appointment, type LeadSourceStats } from "@/lib/api";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [todayAppts, setTodayAppts] = useState<Appointment[]>([]);
+  const [leadSources, setLeadSources] = useState<LeadSourceStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getDashboardStats(), getTodayAppointments()])
-      .then(([s, a]) => {
+    Promise.all([getDashboardStats(), getTodayAppointments(), getLeadSourceStats().catch(() => null)])
+      .then(([s, a, l]) => {
         setStats(s);
         setTodayAppts(a);
+        setLeadSources(l);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -119,6 +121,35 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Lead Sources */}
+      {leadSources && leadSources.total > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Trending className="h-5 w-5 text-[#3B6FFF]" />
+            Where customers found you
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Based on {leadSources.total} booked appointment{leadSources.total !== 1 ? "s" : ""}
+          </p>
+          <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+            {leadSources.sources.map((src) => (
+              <div key={src.source}>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium capitalize text-gray-700">{src.source}</span>
+                  <span className="text-gray-500">{src.count} · {src.percentage}%</span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full bg-[#3B6FFF] transition-all"
+                    style={{ width: `${src.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

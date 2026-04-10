@@ -144,6 +144,33 @@ export const getAdminTickets = () => fetchAPI<AdminTicket[]>("/admin/tickets");
 export const updateAdminTicket = (id: string, data: { status?: string; admin_notes?: string }) =>
   fetchAPI(`/admin/tickets/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 
+// Reviews (company dashboard)
+export interface ReviewItem {
+  id: string;
+  rating: number | null;
+  comment: string | null;
+  forwarded_to_google: boolean;
+  resolved: boolean;
+  resolution_notes: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  service_type: string | null;
+  scheduled_date: string | null;
+  sms_sent_at: string | null;
+  responded_at: string | null;
+  created_at: string;
+}
+export const getReviews = () => fetchAPI<ReviewItem[]>("/admin/reviews");
+export const resolveReview = (id: string, data: { resolved: boolean; resolution_notes?: string }) =>
+  fetchAPI(`/admin/reviews/${id}/resolve`, { method: "PATCH", body: JSON.stringify(data) });
+
+// Lead source stats
+export interface LeadSourceStats {
+  total: number;
+  sources: Array<{ source: string; count: number; percentage: number }>;
+}
+export const getLeadSourceStats = () => fetchAPI<LeadSourceStats>("/admin/lead-sources");
+
 // Google Calendar
 export const sendCalendarInstructions = (techId: string) =>
   fetchAPI<{ success: boolean; message_sid: string }>(`/technicians/${techId}/send-calendar-instructions`, { method: "POST" });
@@ -274,6 +301,9 @@ export interface Company {
   escalation_phone?: string;
   escalation_conditions?: string;
   call_forwarding_confirmed?: boolean;
+  google_review_url?: string;
+  review_request_enabled?: boolean;
+  review_min_stars_for_google?: number;
   trial_ends_at?: string;
   emergency_mode?: string;
   oncall_phone?: string;

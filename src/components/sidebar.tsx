@@ -17,6 +17,7 @@ import {
   X,
   Shield,
   BookOpen,
+  Star,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/customers", label: "Customers", icon: UserCircle },
   { href: "/pricing", label: "Pricing", icon: DollarSign },
   { href: "/calls", label: "Call History", icon: Phone },
+  { href: "/reviews", label: "Reviews", icon: Star },
   { href: "/billing", label: "Billing", icon: CreditCard },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

@@ -23,6 +23,9 @@ interface Company {
   business_hours_start: number;
   business_hours_end: number;
   call_forwarding_confirmed?: boolean;
+  google_review_url?: string;
+  review_request_enabled?: boolean;
+  review_min_stars_for_google?: number;
   trial_ends_at?: string;
 }
 
@@ -41,7 +44,7 @@ interface AuthContextType {
 const TOKEN_KEY = "hvac_token";
 const API_BASE = "/api";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/terms", "/privacy", "/quote", "/approve-quote"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/terms", "/privacy", "/quote", "/approve-quote", "/review"];
 const LANDING_PATH = "/";
 
 // ── Context ─────────────────────────────────────────────────────────────────
@@ -106,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
     const isLanding = pathname === LANDING_PATH;
-    const isStaticPage = pathname === "/terms" || pathname === "/privacy" || pathname.startsWith("/reset-password");
+    const isStaticPage = pathname === "/terms" || pathname === "/privacy" || pathname.startsWith("/reset-password") || pathname.startsWith("/review");
 
     if (!token && !isPublic) {
       router.replace("/login");

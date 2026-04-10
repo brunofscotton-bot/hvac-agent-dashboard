@@ -66,6 +66,9 @@ export default function SettingsPage() {
       oncall_phone: company.oncall_phone,
       oncall_backup_phone: company.oncall_backup_phone,
       oncall_end_hour: company.oncall_end_hour,
+      google_review_url: company.google_review_url,
+      review_request_enabled: company.review_request_enabled,
+      review_min_stars_for_google: company.review_min_stars_for_google,
     });
     setSaving(false);
     setSaved(true);
@@ -388,6 +391,61 @@ export default function SettingsPage() {
             First add technicians on the Technicians page. Then click &quot;Send Setup Link&quot; here — the technician
             receives an SMS, taps the link, signs in to Google, and the calendar connects automatically.
           </p>
+        </div>
+
+        {/* Google Reviews */}
+        <div id="reviews" className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center gap-2">
+            <svg className="h-5 w-5 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+            <h2 className="text-lg font-semibold">Customer Reviews</h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            After each completed service, Ringa automatically sends an SMS asking the customer to rate their experience.
+            Happy customers (4+ stars) are redirected to your Google Business page. Unhappy customers are routed to you internally for resolution.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={company.review_request_enabled ?? true}
+                onChange={(e) => setCompany({ ...company, review_request_enabled: e.target.checked })}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm text-gray-700">
+                Send review request SMS after completed appointments
+              </span>
+            </label>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Google Business Review URL</label>
+              <input
+                value={company.google_review_url ?? ""}
+                onChange={(e) => setCompany({ ...company, google_review_url: e.target.value })}
+                placeholder="https://g.page/r/your-business/review"
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                Find this link in your Google Business Profile under &quot;Ask for reviews&quot;. Customers who give 4+ stars will be redirected here.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Minimum stars to forward to Google</label>
+              <select
+                value={company.review_min_stars_for_google ?? 4}
+                onChange={(e) => setCompany({ ...company, review_min_stars_for_google: Number(e.target.value) })}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value={5}>5 stars only (most strict)</option>
+                <option value={4}>4 or 5 stars (recommended)</option>
+                <option value={3}>3, 4, or 5 stars</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-400">Reviews below this threshold stay internal so you can resolve issues privately.</p>
+            </div>
+          </div>
         </div>
 
         {/* Jobber Integration */}

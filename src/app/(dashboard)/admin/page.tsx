@@ -198,10 +198,11 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    Promise.all([getAdminCompanies(), getAdminStats()])
-      .then(([c, s]) => {
+    Promise.all([getAdminCompanies(), getAdminStats(), getAdminTickets()])
+      .then(([c, s, t]) => {
         setCompanies(c);
         setStats(s);
+        setTickets(t);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
