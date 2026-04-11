@@ -14,9 +14,13 @@ import {
   Phone,
   Link2,
   MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  SkipForward,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { completeOnboarding, createSupportTicket, type OnboardingData } from "@/lib/api";
+import { LivePreview } from "@/components/live-preview";
 
 // ── Step definitions ────────────────────────────────────────────────────────
 
@@ -78,7 +82,7 @@ export default function OnboardingPage() {
     business_hours_start: 8,
     business_hours_end: 21,
     agent_name: "Ana",
-    languages_supported: "en",
+    languages_supported: "en,pt,es",  // default all three
     greeting_message: "",
     voice_gender: "female",
     service_area_zip_codes: "",
@@ -86,6 +90,37 @@ export default function OnboardingPage() {
 
   const [technicians, setTechnicians] = useState<TechForm[]>([{ ...emptyTech }]);
   const [sendCalendarSms, setSendCalendarSms] = useState(true);
+
+  // Collapsible state for optional sections in each step
+  const [showAddressDetails, setShowAddressDetails] = useState(false);
+  const [showPricingExtras, setShowPricingExtras] = useState(false);
+  const [techMoreOptions, setTechMoreOptions] = useState<Record<number, boolean>>({});
+
+  // Live preview text derived from current form state
+  const previewGreeting = (() => {
+    const cn = form.company_name.trim() || "your company";
+    if (form.greeting_message.trim()) {
+      return form.greeting_message
+        .replace(/\{company_name\}/g, cn)
+        .replace(/\{agent_name\}/g, form.agent_name || "Ana");
+    }
+    return `Thanks for calling ${cn}. This is ${form.agent_name || "Ana"} — how can I help you today?`;
+  })();
+
+  const previewPricing = (() => {
+    const fee = form.service_fee || 80;
+    const ahFee = form.after_hours_fee || 180;
+    const credit = form.fee_applies_to_service
+      ? " And good news — this fee applies toward the cost of any repair."
+      : "";
+    return `Our visit fee is $${fee} during business hours. For after-hours and weekends, it's $${ahFee}.${credit}`;
+  })();
+
+  const previewScheduling = (() => {
+    const firstTech = technicians.find((t) => t.name.trim());
+    const techName = firstTech?.name.trim() || "our technician";
+    return `I have an opening tomorrow at 9 AM with ${techName}. Does that work for you?`;
+  })();
 
   const updateForm = (key: string, value: any) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -403,74 +438,110 @@ export default function OnboardingPage() {
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         {/* Step 0: Company Info */}
         {step === 0 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">Company Information</h2>
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Company Name</label>
-              <input
-                value={form.company_name}
-                onChange={(e) => { updateForm("company_name", e.target.value); setStepError(""); }}
-                className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm ${stepError && !form.company_name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
-                placeholder="Your HVAC Company"
-              />
+              <h2 className="text-lg font-bold">Company Information</h2>
+              <p className="mt-1 text-sm text-gray-500">Ringa uses this to greet your callers.</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Phone</label>
-              <input
-                value={form.phone}
-                onChange={(e) => updateForm("phone", e.target.value)}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder="+1 (407) 555-1234"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Address</label>
-              <textarea
-                value={form.address}
-                onChange={(e) => updateForm("address", e.target.value)}
-                rows={2}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder="123 Main St, Orlando, FL 32801"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            {/* Required fields */}
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">City</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
                 <input
-                  value={form.city}
-                  onChange={(e) => updateForm("city", e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  placeholder="Orlando"
+                  value={form.company_name}
+                  onChange={(e) => { updateForm("company_name", e.target.value); setStepError(""); }}
+                  className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm ${stepError && !form.company_name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
+                  placeholder="Sunshine HVAC"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">State</label>
-                <select
-                  value={form.state}
-                  onChange={(e) => updateForm("state", e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                >
-                  {US_STATES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    City <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={form.city}
+                    onChange={(e) => updateForm("city", e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="Orlando"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">For your local phone number</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">State</label>
+                  <select
+                    value={form.state}
+                    onChange={(e) => updateForm("state", e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    {US_STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-            <p className="text-xs text-gray-400">
-              Your Ringa phone number will be a local number for {form.city || "your city"}, {form.state || "your state"}.
-              You can configure service area zip codes in Settings after setup.
-            </p>
+
+            {/* Optional address details — collapsed by default */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50/50">
+              <button
+                type="button"
+                onClick={() => setShowAddressDetails(!showAddressDetails)}
+                className="flex w-full items-center justify-between px-4 py-3 text-left"
+              >
+                <div>
+                  <span className="text-sm font-medium text-gray-700">More details</span>
+                  <span className="ml-2 text-xs text-gray-400">Optional — can add later</span>
+                </div>
+                {showAddressDetails ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+              </button>
+              {showAddressDetails && (
+                <div className="space-y-4 border-t border-gray-200 bg-white p-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Business phone</label>
+                    <input
+                      value={form.phone}
+                      onChange={(e) => updateForm("phone", e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      placeholder="+1 (407) 555-1234"
+                    />
+                    <p className="mt-1 text-xs text-gray-400">For support and notifications</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Full address</label>
+                    <textarea
+                      value={form.address}
+                      onChange={(e) => updateForm("address", e.target.value)}
+                      rows={2}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      placeholder="123 Main St, Orlando, FL 32801"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Live preview */}
+            <LivePreview text={previewGreeting} voice={form.voice_gender as any} language="en" />
           </div>
         )}
 
         {/* Step 1: Pricing */}
         {step === 1 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">Pricing Configuration</h2>
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-lg font-bold">Pricing</h2>
+              <p className="mt-1 text-sm text-gray-500">Ringa quotes these automatically to every caller.</p>
+            </div>
+
+            {/* Required fees */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Regular Visit Fee ($)
+                  Regular visit fee ($) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -478,11 +549,11 @@ export default function OnboardingPage() {
                   onChange={(e) => updateForm("service_fee", Number(e.target.value))}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 />
-                <p className="mt-1 text-xs text-gray-400">Mon-Fri, business hours</p>
+                <p className="mt-1 text-xs text-gray-400">Mon–Fri, business hours</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  After-Hours / Weekend Fee ($)
+                  After-hours fee ($) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -493,62 +564,68 @@ export default function OnboardingPage() {
                 <p className="mt-1 text-xs text-gray-400">Evenings & weekends</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Business Hours Start
-                </label>
-                <select
-                  value={form.business_hours_start}
-                  onChange={(e) =>
-                    updateForm("business_hours_start", Number(e.target.value))
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 5).map((h) => (
-                    <option key={h} value={h}>
-                      {h > 12 ? `${h - 12} PM` : `${h} AM`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Business Hours End
-                </label>
-                <select
-                  value={form.business_hours_end}
-                  onChange={(e) =>
-                    updateForm("business_hours_end", Number(e.target.value))
-                  }
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 14).map((h) => (
-                    <option key={h} value={h}>
-                      {h > 12 ? `${h - 12} PM` : `${h} AM`}
-                    </option>
-                  ))}
-                </select>
-              </div>
+
+            {/* Optional pricing extras */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50/50">
+              <button
+                type="button"
+                onClick={() => setShowPricingExtras(!showPricingExtras)}
+                className="flex w-full items-center justify-between px-4 py-3 text-left"
+              >
+                <div>
+                  <span className="text-sm font-medium text-gray-700">Business hours & extras</span>
+                  <span className="ml-2 text-xs text-gray-400">
+                    Optional — defaults: 8 AM–9 PM, fee applies to repair
+                  </span>
+                </div>
+                {showPricingExtras ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+              </button>
+              {showPricingExtras && (
+                <div className="space-y-4 border-t border-gray-200 bg-white p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Business hours start</label>
+                      <select
+                        value={form.business_hours_start}
+                        onChange={(e) => updateForm("business_hours_start", Number(e.target.value))}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => i + 5).map((h) => (
+                          <option key={h} value={h}>{h > 12 ? `${h - 12} PM` : `${h} AM`}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Business hours end</label>
+                      <select
+                        value={form.business_hours_end}
+                        onChange={(e) => updateForm("business_hours_end", Number(e.target.value))}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => i + 14).map((h) => (
+                          <option key={h} value={h}>{h > 12 ? `${h - 12} PM` : `${h} AM`}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <label className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={form.fee_applies_to_service}
+                      onChange={(e) => updateForm("fee_applies_to_service", e.target.checked)}
+                      className="mt-0.5 rounded border-gray-300"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Visit fee applies toward repair cost</p>
+                      <p className="text-xs text-gray-400">Deducted from total if customer proceeds with service</p>
+                    </div>
+                  </label>
+                </div>
+              )}
             </div>
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={form.fee_applies_to_service}
-                onChange={(e) =>
-                  updateForm("fee_applies_to_service", e.target.checked)
-                }
-                className="rounded border-gray-300"
-              />
-              <div>
-                <p className="text-sm font-medium text-gray-700">
-                  Visit fee applies toward repair cost
-                </p>
-                <p className="text-xs text-gray-400">
-                  Deducted from total if customer proceeds with service
-                </p>
-              </div>
-            </label>
+
+            {/* Live preview */}
+            <LivePreview title="How Ringa explains your pricing" text={previewPricing} voice={form.voice_gender as any} language="en" />
           </div>
         )}
 
@@ -583,84 +660,103 @@ export default function OnboardingPage() {
                 <Plus className="h-3.5 w-3.5" /> Add
               </button>
             </div>
-            {technicians.map((tech, i) => (
-              <div key={i} className="rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium">Technician {i + 1}</h3>
-                  {technicians.length > 1 && (
-                    <button
-                      onClick={() => removeTechnician(i)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <input
-                    required
-                    placeholder="Name *"
-                    value={tech.name}
-                    onChange={(e) => { updateTech(i, "name", e.target.value); setStepError(""); }}
-                    className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
-                  />
-                  <input
-                    required
-                    placeholder="Phone * (+1...)"
-                    value={tech.phone}
-                    onChange={(e) => { updateTech(i, "phone", e.target.value); setStepError(""); }}
-                    className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.phone.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
-                  />
-                  <input
-                    placeholder="Email"
-                    value={tech.email}
-                    onChange={(e) => updateTech(i, "email", e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  />
-                  <select
-                    value={tech.calendar_provider || "none"}
-                    onChange={(e) => updateTech(i, "calendar_provider", e.target.value)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            {technicians.map((tech, i) => {
+              const isExpanded = !!techMoreOptions[i];
+              return (
+                <div key={i} className="rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium">Technician {i + 1}</h3>
+                    {technicians.length > 1 && (
+                      <button
+                        onClick={() => removeTechnician(i)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  {/* Required: name + phone */}
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <input
+                      required
+                      placeholder="Name *"
+                      value={tech.name}
+                      onChange={(e) => { updateTech(i, "name", e.target.value); setStepError(""); }}
+                      className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.name.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
+                    />
+                    <input
+                      required
+                      placeholder="Phone * (+1...)"
+                      value={tech.phone}
+                      onChange={(e) => { updateTech(i, "phone", e.target.value); setStepError(""); }}
+                      className={`rounded-lg border px-3 py-2 text-sm ${stepError && !tech.phone.trim() ? "border-red-400 bg-red-50" : "border-gray-300"}`}
+                    />
+                  </div>
+
+                  {/* Optional: everything else */}
+                  <button
+                    type="button"
+                    onClick={() => setTechMoreOptions((prev) => ({ ...prev, [i]: !prev[i] }))}
+                    className="mt-3 flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
                   >
-                    <option value="none">No Calendar Sync</option>
-                    <option value="google">Google Calendar</option>
-                  </select>
-                  {tech.calendar_provider === "google" && (
-                    <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
-                      After onboarding, this technician will receive an SMS with a link to connect their Google Calendar — one tap, sign in, done.
+                    {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    {isExpanded ? "Hide" : "Show"} more options
+                    <span className="text-gray-400">— email, calendar sync, specialties</span>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="mt-3 grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                      <input
+                        placeholder="Email"
+                        value={tech.email}
+                        onChange={(e) => updateTech(i, "email", e.target.value)}
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <select
+                        value={tech.calendar_provider || "none"}
+                        onChange={(e) => updateTech(i, "calendar_provider", e.target.value)}
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      >
+                        <option value="none">No Calendar Sync</option>
+                        <option value="google">Google Calendar</option>
+                      </select>
+                      {tech.calendar_provider === "google" && (
+                        <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
+                          This technician will receive an SMS with a link to connect their Google Calendar — one tap, done.
+                        </div>
+                      )}
+                      <input
+                        placeholder="Specialties (AC, Heating, Duct)"
+                        value={tech.specialties}
+                        onChange={(e) => updateTech(i, "specialties", e.target.value)}
+                        className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={tech.works_after_hours}
+                          onChange={(e) => updateTech(i, "works_after_hours", e.target.checked)}
+                          className="rounded border-gray-300"
+                        />
+                        Works after hours
+                      </label>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={tech.works_weekends}
+                          onChange={(e) => updateTech(i, "works_weekends", e.target.checked)}
+                          className="rounded border-gray-300"
+                        />
+                        Works weekends
+                      </label>
                     </div>
                   )}
-                  <input
-                    placeholder="Specialties (AC, Heating, Duct)"
-                    value={tech.specialties}
-                    onChange={(e) => updateTech(i, "specialties", e.target.value)}
-                    className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                  />
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={tech.works_after_hours}
-                      onChange={(e) =>
-                        updateTech(i, "works_after_hours", e.target.checked)
-                      }
-                      className="rounded border-gray-300"
-                    />
-                    Works after hours
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={tech.works_weekends}
-                      onChange={(e) =>
-                        updateTech(i, "works_weekends", e.target.checked)
-                      }
-                      className="rounded border-gray-300"
-                    />
-                    Works weekends
-                  </label>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
+            {/* Live preview */}
+            <LivePreview title="How Ringa will dispatch" text={previewScheduling} voice={form.voice_gender as any} language="en" />
 
             {/* Calendar SMS opt-in */}
             {technicians.some((t) => t.calendar_provider === "google") && (
@@ -689,26 +785,48 @@ export default function OnboardingPage() {
 
         {/* Step 3: Customization */}
         {step === 3 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">Agent Customization</h2>
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Agent Name
-              </label>
+              <h2 className="text-lg font-bold">Personalize Ringa</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Everything here is optional. We picked sensible defaults so you can skip ahead.
+              </p>
+            </div>
+
+            {/* Defaults summary */}
+            <div className="rounded-lg border border-[#3B6FFF]/20 bg-[#3B6FFF]/5 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#3B6FFF]">
+                Current defaults
+              </p>
+              <ul className="mt-2 space-y-1 text-sm text-gray-700">
+                <li>• Agent name: <span className="font-medium">{form.agent_name || "Ana"}</span></li>
+                <li>• Voice: <span className="font-medium capitalize">{form.voice_gender}</span></li>
+                <li>• Languages: <span className="font-medium">
+                  {form.languages_supported
+                    .split(",")
+                    .map((l) => ({ en: "English", pt: "Portuguese", es: "Spanish" } as any)[l])
+                    .filter(Boolean)
+                    .join(", ")}
+                </span></li>
+                <li>• Greeting: <span className="font-medium">{form.greeting_message ? "Custom" : "Default"}</span></li>
+              </ul>
+              <p className="mt-3 text-xs text-gray-500">
+                Click &quot;Launch Agent&quot; below to use these defaults, or customize anything you want first.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Agent name</label>
               <input
                 value={form.agent_name}
                 onChange={(e) => updateForm("agent_name", e.target.value)}
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 placeholder="Ana"
               />
-              <p className="mt-1 text-xs text-gray-400">
-                The name your Ringa receptionist will use when greeting callers
-              </p>
+              <p className="mt-1 text-xs text-gray-400">What the AI calls itself when greeting callers</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Agent Voice
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Agent voice</label>
               <div className="mt-2 flex gap-3">
                 {[
                   { value: "female", label: "Female" },
@@ -731,14 +849,9 @@ export default function OnboardingPage() {
                   );
                 })}
               </div>
-              <p className="mt-1 text-xs text-gray-400">
-                Choose the voice your Ringa receptionist will use on calls
-              </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Languages Supported
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Languages supported</label>
               <div className="mt-2 flex gap-3">
                 {[
                   { code: "en", label: "English" },
@@ -763,24 +876,23 @@ export default function OnboardingPage() {
                 })}
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Your agent will detect and respond in these languages
+                Ringa auto-detects and switches between them mid-call
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Custom Greeting (optional)
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Custom greeting (optional)</label>
               <textarea
                 value={form.greeting_message}
                 onChange={(e) => updateForm("greeting_message", e.target.value)}
                 rows={3}
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder={`Thank you for calling ${form.company_name || "your company"}! My name is ${form.agent_name}. How can I help you today?`}
+                placeholder={`Thanks for calling ${form.company_name || "your company"}! This is ${form.agent_name || "Ana"} — how can I help?`}
               />
-              <p className="mt-1 text-xs text-gray-400">
-                Leave blank for the default greeting
-              </p>
+              <p className="mt-1 text-xs text-gray-400">Leave blank for the default greeting</p>
             </div>
+
+            {/* Live preview */}
+            <LivePreview text={previewGreeting} voice={form.voice_gender as any} language="en" />
           </div>
         )}
 
