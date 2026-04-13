@@ -406,7 +406,7 @@ export default function SettingsPage() {
                   >
                     <Send className="h-3 w-3" />
                     {tech.calendar_provider !== "google"
-                      ? "—"
+                      ? "-"
                       : tech.google_calendar_id
                       ? "Connected"
                       : smsSent.has(tech.id)

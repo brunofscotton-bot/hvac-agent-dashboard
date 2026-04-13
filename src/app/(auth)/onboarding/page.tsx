@@ -550,7 +550,7 @@ export default function OnboardingPage() {
                   onChange={(e) => updateForm("service_fee", Number(e.target.value))}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 />
-                <p className="mt-1 text-xs text-gray-400">Mon–Fri, business hours</p>
+                <p className="mt-1 text-xs text-gray-400">Mon-Fri, business hours</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">

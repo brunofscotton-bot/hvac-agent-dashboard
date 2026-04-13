@@ -531,7 +531,7 @@ export default function AdminPage() {
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
                           <p className="text-xs font-medium text-gray-400 uppercase">Contact</p>
-                          <p className="mt-1 text-sm">{c.phone || "—"}</p>
+                          <p className="mt-1 text-sm">{c.phone || "-"}</p>
                           <p className="text-sm text-gray-500">{c.city}, {c.state}</p>
                         </div>
                         <div>

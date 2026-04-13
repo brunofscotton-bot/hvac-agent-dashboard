@@ -314,7 +314,7 @@ export default function NewCampaignPage() {
                     {previewLoading
                       ? "Calculating..."
                       : eligibleCount == null
-                      ? "—"
+                      ? "-"
                       : `${eligibleCount} eligible customers`}
                   </p>
                 </div>

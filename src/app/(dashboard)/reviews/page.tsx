@@ -72,7 +72,7 @@ export default function ReviewsPage() {
         <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-500">Average Rating</p>
           <p className="mt-1 text-2xl font-bold">
-            {stats.avg ? <>{stats.avg} <span className="text-sm text-yellow-400">★</span></> : "—"}
+            {stats.avg ? <>{stats.avg} <span className="text-sm text-yellow-400">★</span></> : "-"}
           </p>
           <p className="text-xs text-gray-400">{stats.responded} responses</p>
         </div>
