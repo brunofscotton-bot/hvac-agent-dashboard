@@ -123,19 +123,19 @@ export default function BillingPage() {
                   onClick={() => handleSubscribe("starter")}
                   className="rounded-lg border border-[#3B6FFF] px-4 py-2 text-sm font-medium text-[#3B6FFF] hover:bg-[#3B6FFF]/10"
                 >
-                  Starter — $99/mo
+                  Starter: $99/mo
                 </button>
                 <button
                   onClick={() => handleSubscribe("pro")}
                   className="rounded-lg bg-[#3B6FFF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2D5FE6]"
                 >
-                  Pro — $249/mo
+                  Pro: $249/mo
                 </button>
                 <button
                   onClick={() => handleSubscribe("business")}
                   className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Business — $449/mo
+                  Business: $449/mo
                 </button>
               </div>
             </div>
@@ -183,15 +183,15 @@ export default function BillingPage() {
                 <p className="text-sm text-gray-500 mb-3">Choose a plan to unlock all features:</p>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Starter — $99/mo</p>
+                    <p className="text-sm font-semibold text-gray-700">Starter: $99/mo</p>
                     <p className="mt-1 text-xs text-gray-500">1 technician, 300 min/mo, Google Calendar, SMS, 15-day transcripts</p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Pro — $249/mo</p>
+                    <p className="text-sm font-semibold text-gray-700">Pro: $249/mo</p>
                     <p className="mt-1 text-xs text-gray-500">Up to 5 techs, 1,500 min/mo, Jobber, Pricebook, 30-day transcripts</p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-700">Business — $449/mo</p>
+                    <p className="text-sm font-semibold text-gray-700">Business: $449/mo</p>
                     <p className="mt-1 text-xs text-gray-500">Up to 15 techs, unlimited minutes, 3-month transcripts, dedicated manager</p>
                   </div>
                   <p className="text-xs text-gray-400">

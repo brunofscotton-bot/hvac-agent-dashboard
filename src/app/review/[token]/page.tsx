@@ -130,7 +130,7 @@ export default function ReviewPage() {
               </h2>
               <p className="mt-2 text-sm text-gray-400">
                 {rating && rating <= 3
-                  ? "What went wrong? Your feedback goes directly to the team — not posted publicly."
+                  ? "What went wrong? Your feedback goes directly to the team, not posted publicly."
                   : "Anything else you'd like the team to know?"}
               </p>
             </div>

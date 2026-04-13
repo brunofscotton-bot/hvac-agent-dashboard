@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Ringa — Your front desk, always on";
+export const alt = "Ringa: Your front desk, always on";
 export const size = {
   width: 1200,
   height: 630,
@@ -97,7 +97,7 @@ export default async function OGImage() {
             display: "flex",
           }}
         >
-          AI receptionist for HVAC companies. Answers every call, books every job, dispatches your techs — 24/7.
+          AI receptionist for HVAC companies. Answers every call, books every job, dispatches your techs. 24/7.
         </div>
 
         {/* Badge */}

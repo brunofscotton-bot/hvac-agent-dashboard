@@ -143,13 +143,13 @@ export default function TechniciansPage() {
             <div>
               <p className="text-sm font-medium text-green-800">
                 {jobberConnected
-                  ? "Jobber is connected — sync your technicians automatically"
+                  ? "Jobber is connected. Sync your technicians automatically"
                   : "Use Jobber? Connect it to import your active technicians automatically"}
               </p>
               <p className="mt-0.5 text-xs text-green-600">
                 {jobberConnected
                   ? "Click \"Sync from Jobber\" to import any new team members."
-                  : "No need to add technicians manually — we'll pull them from your Jobber account."}
+                  : "No need to add technicians manually. We'll pull them from your Jobber account."}
               </p>
             </div>
             {jobberConnected ? (
@@ -166,7 +166,7 @@ export default function TechniciansPage() {
                       setSyncResult("All technicians already synced");
                     }
                   } catch (e: any) {
-                    setSyncResult(e?.message || "Sync failed — try disconnecting and reconnecting Jobber in Settings");
+                    setSyncResult(e?.message || "Sync failed. Try disconnecting and reconnecting Jobber in Settings");
                   }
                   setSyncing(false);
                 }}
@@ -219,7 +219,7 @@ export default function TechniciansPage() {
                   <p className="font-medium">Next step: Send setup link to the technician</p>
                   <p className="mt-1">
                     After saving, go to <span className="font-semibold">Settings → Google Calendar Sync</span> and click
-                    &quot;Send Setup Link&quot;. The technician will receive an SMS — they just tap the link,
+                    &quot;Send Setup Link&quot;. The technician will receive an SMS. They just tap the link,
                     sign in to Google, and their calendar connects automatically.
                   </p>
                 </div>
@@ -455,7 +455,7 @@ function SchedulePanel({ technicianId }: { technicianId: string }) {
             <div key={block.id} className="flex items-center justify-between rounded bg-gray-50 px-3 py-1.5 text-xs">
               <span>
                 {new Date(block.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                {block.note && ` — ${block.note}`}
+                {block.note && `: ${block.note}`}
               </span>
               <button onClick={() => block.id && handleDeleteTimeOff(block.id)} className="text-red-500 hover:text-red-700">
                 <X className="h-3.5 w-3.5" />

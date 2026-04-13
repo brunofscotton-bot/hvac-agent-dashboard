@@ -78,6 +78,7 @@ export default function OnboardingPage() {
     state: "FL",
     service_fee: 80,
     after_hours_fee: 180,
+    after_hours_credit: 80,
     fee_applies_to_service: true,
     business_hours_start: 8,
     business_hours_end: 21,
@@ -104,14 +105,14 @@ export default function OnboardingPage() {
         .replace(/\{company_name\}/g, cn)
         .replace(/\{agent_name\}/g, form.agent_name || "Ana");
     }
-    return `Thanks for calling ${cn}. This is ${form.agent_name || "Ana"} — how can I help you today?`;
+    return `Thanks for calling ${cn}. This is ${form.agent_name || "Ana"}. How can I help you today?`;
   })();
 
   const previewPricing = (() => {
     const fee = form.service_fee || 80;
     const ahFee = form.after_hours_fee || 180;
     const credit = form.fee_applies_to_service
-      ? " And good news — this fee applies toward the cost of any repair."
+      ? " And good news: this fee applies toward the cost of any repair."
       : "";
     return `Our visit fee is $${fee} during business hours. For after-hours and weekends, it's $${ahFee}.${credit}`;
   })();
@@ -222,7 +223,7 @@ export default function OnboardingPage() {
           )}
         </div>
 
-        {/* Step 1: Forward Calls — codes first */}
+        {/* Step 1: Forward Calls */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-start gap-4">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#3B6FFF] text-sm font-bold text-white">
@@ -235,7 +236,7 @@ export default function OnboardingPage() {
                 Pick your carrier and dial the code below:
               </p>
 
-              {/* Carrier codes — prominent and first */}
+              {/* Carrier codes */}
               <div className="mt-4 space-y-3">
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                   <p className="text-sm font-semibold text-gray-800">AT&T / T-Mobile</p>
@@ -260,7 +261,7 @@ export default function OnboardingPage() {
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm font-semibold text-amber-800">Ring Time Guide</p>
                 <p className="mt-1 text-xs text-amber-700">
-                  The codes above use 10-second forwarding (~2–3 rings) — the sweet spot so Ringa picks up quickly without cutting off your chance to answer first.
+                  The codes above use 10-second forwarding (about 2 to 3 rings). The sweet spot so Ringa picks up quickly without cutting off your chance to answer first.
                 </p>
                 <div className="mt-2 grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-lg bg-white p-2 shadow-sm">
@@ -303,7 +304,7 @@ export default function OnboardingPage() {
                           .filter((t) => t.name && t.calendar_provider === "google")
                           .map((t, i) => (
                             <p key={i} className="text-sm text-green-700">
-                              {t.name} — {t.phone}
+                              {t.name} ({t.phone})
                             </p>
                           ))}
                       </div>
@@ -485,7 +486,7 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            {/* Optional address details — collapsed by default */}
+            {/* Optional address details */}
             <div className="rounded-lg border border-gray-200 bg-gray-50/50">
               <button
                 type="button"
@@ -494,7 +495,7 @@ export default function OnboardingPage() {
               >
                 <div>
                   <span className="text-sm font-medium text-gray-700">More details</span>
-                  <span className="ml-2 text-xs text-gray-400">Optional — can add later</span>
+                  <span className="ml-2 text-xs text-gray-400">Optional, can add later</span>
                 </div>
                 {showAddressDetails ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
               </button>
@@ -575,7 +576,7 @@ export default function OnboardingPage() {
                 <div>
                   <span className="text-sm font-medium text-gray-700">Business hours & extras</span>
                   <span className="ml-2 text-xs text-gray-400">
-                    Optional — defaults: 8 AM–9 PM, fee applies to repair
+                    Optional. Defaults: 8 AM to 9 PM, fee applies to repair
                   </span>
                 </div>
                 {showPricingExtras ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
@@ -620,6 +621,20 @@ export default function OnboardingPage() {
                       <p className="text-xs text-gray-400">Deducted from total if customer proceeds with service</p>
                     </div>
                   </label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Amount applied to repair (after-hours) ($)
+                    </label>
+                    <input
+                      type="number"
+                      value={form.after_hours_credit}
+                      onChange={(e) => updateForm("after_hours_credit", Number(e.target.value))}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                    <p className="mt-1 text-xs text-gray-400">
+                      Of the ${form.after_hours_fee} after-hours fee, this amount is credited toward the repair. The rest is a surcharge.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -652,7 +667,7 @@ export default function OnboardingPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-400">Calendar sync is optional — you can configure it after setup.</p>
+              <p className="text-sm text-gray-400">Calendar sync is optional. You can configure it after setup.</p>
               <button
                 onClick={addTechnician}
                 className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
@@ -701,7 +716,7 @@ export default function OnboardingPage() {
                   >
                     {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                     {isExpanded ? "Hide" : "Show"} more options
-                    <span className="text-gray-400">— email, calendar sync, specialties</span>
+                    <span className="text-gray-400">(email, calendar sync, specialties)</span>
                   </button>
 
                   {isExpanded && (
@@ -722,7 +737,7 @@ export default function OnboardingPage() {
                       </select>
                       {tech.calendar_provider === "google" && (
                         <div className="col-span-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-700">
-                          This technician will receive an SMS with a link to connect their Google Calendar — one tap, done.
+                          This technician will receive an SMS with a link to connect their Google Calendar. One tap, done.
                         </div>
                       )}
                       <input
@@ -886,7 +901,7 @@ export default function OnboardingPage() {
                 onChange={(e) => updateForm("greeting_message", e.target.value)}
                 rows={3}
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                placeholder={`Thanks for calling ${form.company_name || "your company"}! This is ${form.agent_name || "Ana"} — how can I help?`}
+                placeholder={`Thanks for calling ${form.company_name || "your company"}! This is ${form.agent_name || "Ana"}. How can I help?`}
               />
               <p className="mt-1 text-xs text-gray-400">Leave blank for the default greeting</p>
             </div>
@@ -909,7 +924,7 @@ export default function OnboardingPage() {
                 <h3 className="text-sm font-semibold text-gray-700">Company</h3>
                 <p className="mt-1 text-sm">{form.company_name}</p>
                 <p className="text-xs text-gray-500">
-                  {form.city}, {form.state} — Ringa AI assistant will be activated
+                  {form.city}, {form.state}. Ringa AI assistant will be activated
                 </p>
               </div>
 
@@ -936,7 +951,7 @@ export default function OnboardingPage() {
                   .filter((t) => t.name)
                   .map((t, i) => (
                     <p key={i} className="mt-1 text-sm">
-                      {t.name} — {t.phone}
+                      {t.name} ({t.phone})
                       {t.calendar_provider === "google" && " (Google Calendar)"}
                     </p>
                   ))}

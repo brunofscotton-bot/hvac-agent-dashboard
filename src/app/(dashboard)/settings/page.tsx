@@ -323,7 +323,7 @@ export default function SettingsPage() {
               </div>
             ) : (
               <div className="mt-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-400">
-                Not yet provisioned — complete onboarding to get your number
+                Not yet provisioned. Complete onboarding to get your number
               </div>
             )}
             <p className="mt-1 text-xs text-gray-400">
@@ -420,7 +420,7 @@ export default function SettingsPage() {
             )}
           </div>
           <p className="mt-3 text-xs text-gray-400">
-            First add technicians on the Technicians page. Then click &quot;Send Setup Link&quot; here — the technician
+            First add technicians on the Technicians page. Then click &quot;Send Setup Link&quot; here. The technician
             receives an SMS, taps the link, signs in to Google, and the calendar connects automatically.
           </p>
         </div>
@@ -599,7 +599,7 @@ export default function SettingsPage() {
             <h2 className="text-lg font-semibold">Call Escalation</h2>
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            Transfer calls to a live person when the AI determines the customer genuinely needs human assistance — complex situations, complaints, or customers who are clearly frustrated.
+            Transfer calls to a live person when the AI determines the customer genuinely needs human assistance: complex situations, complaints, or customers who are clearly frustrated.
           </p>
           <div className="mt-4 flex items-center gap-3">
             <button

@@ -365,6 +365,7 @@ export interface Company {
   languages_supported: string;
   service_fee: number;
   after_hours_fee: number;
+  after_hours_credit?: number | null;
   fee_applies_to_service: boolean;
   business_hours_start: number;
   business_hours_end: number;
@@ -408,6 +409,7 @@ export interface OnboardingData {
   state: string;
   service_fee: number;
   after_hours_fee: number;
+  after_hours_credit?: number;
   fee_applies_to_service: boolean;
   business_hours_start: number;
   business_hours_end: number;

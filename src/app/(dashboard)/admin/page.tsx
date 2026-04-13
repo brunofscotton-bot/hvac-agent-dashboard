@@ -232,7 +232,7 @@ export default function AdminPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-        <p className="mt-1 text-sm text-gray-500">Ringa platform overview — all companies</p>
+        <p className="mt-1 text-sm text-gray-500">Ringa platform overview, all companies</p>
       </div>
 
       {/* Stats */}
@@ -311,7 +311,7 @@ export default function AdminPage() {
             <>
               <div className="border-b border-gray-200 px-6 py-4">
                 <h2 className="font-semibold text-gray-900">
-                  Infrastructure Costs — {costs.period}
+                  Infrastructure Costs: {costs.period}
                 </h2>
               </div>
 
@@ -396,7 +396,7 @@ export default function AdminPage() {
                       </div>
                       <p className="mt-1 text-sm text-gray-600">{ticket.message}</p>
                       <p className="mt-1 text-xs text-gray-400">
-                        {ticket.company_name} ({ticket.company_email}) — {new Date(ticket.created_at).toLocaleString()}
+                        {ticket.company_name} ({ticket.company_email}), {new Date(ticket.created_at).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex shrink-0 gap-1">

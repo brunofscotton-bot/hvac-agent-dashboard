@@ -4,9 +4,9 @@ import { AuthProvider } from "@/lib/auth";
 
 const SITE_URL = "https://ringa.live";
 const SITE_NAME = "Ringa";
-const TITLE = "Ringa — Your front desk, always on";
+const TITLE = "Ringa: Your front desk, always on";
 const DESCRIPTION =
-  "AI receptionist for HVAC companies. Answers every call, books every job, dispatches your techs — in English, Spanish & Portuguese. 24/7.";
+  "AI receptionist for HVAC companies. Answers every call, books every job, dispatches your techs in English, Spanish & Portuguese. 24/7.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -103,7 +103,7 @@ export default function PlansPage() {
             <Clock className="h-5 w-5 shrink-0 text-amber-600" />
             <div className="flex-1">
               <p className="text-sm font-semibold text-amber-800">
-                You&apos;re on a Free Trial — {trialDaysRemaining} days remaining
+                You&apos;re on a Free Trial: {trialDaysRemaining} days remaining
               </p>
               <p className="text-xs text-amber-700">
                 Activate a plan now to keep your Ringa receptionist running after your trial ends.
