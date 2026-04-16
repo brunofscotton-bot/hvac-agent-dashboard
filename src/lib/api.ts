@@ -308,6 +308,7 @@ export interface Appointment {
   };
   technician_notes?: string;
   resolution?: string;
+  lead_source?: string;
   created_at: string;
 }
 

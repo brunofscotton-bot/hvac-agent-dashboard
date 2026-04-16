@@ -59,6 +59,7 @@ export default function AppointmentDetailPage() {
   const [status, setStatus] = useState("");
   const [technicianNotes, setTechnicianNotes] = useState("");
   const [resolution, setResolution] = useState("");
+  const [leadSource, setLeadSource] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -69,6 +70,7 @@ export default function AppointmentDetailPage() {
         setStatus(appt.status);
         setTechnicianNotes(appt.technician_notes ?? "");
         setResolution(appt.resolution ?? "");
+        setLeadSource(appt.lead_source ?? "");
       })
       .catch((err) => {
         setError(err.message || "Appointment not found");
@@ -84,6 +86,7 @@ export default function AppointmentDetailPage() {
         status,
         technician_notes: technicianNotes || undefined,
         resolution: resolution || undefined,
+        lead_source: leadSource || undefined,
       });
       setAppointment((prev) =>
         prev
@@ -92,6 +95,7 @@ export default function AppointmentDetailPage() {
               status,
               technician_notes: technicianNotes || undefined,
               resolution: resolution || undefined,
+              lead_source: leadSource || undefined,
             }
           : prev
       );
@@ -278,6 +282,35 @@ export default function AppointmentDetailPage() {
                   placeholder="Describe how the issue was resolved..."
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 />
+              </div>
+
+              {/* Lead Source */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Lead Source
+                </label>
+                <p className="mt-0.5 text-xs text-gray-400">
+                  How the customer found you (captured by the AI during the call).
+                </p>
+                <input
+                  type="text"
+                  list="lead-source-options"
+                  value={leadSource}
+                  onChange={(e) => setLeadSource(e.target.value)}
+                  placeholder="e.g. Google, Referral, Yelp, Yard sign..."
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                />
+                <datalist id="lead-source-options">
+                  <option value="Google" />
+                  <option value="Referral" />
+                  <option value="Yelp" />
+                  <option value="Facebook" />
+                  <option value="Instagram" />
+                  <option value="Website" />
+                  <option value="Yard sign" />
+                  <option value="Returning customer" />
+                  <option value="Other" />
+                </datalist>
               </div>
 
               {/* Save */}
