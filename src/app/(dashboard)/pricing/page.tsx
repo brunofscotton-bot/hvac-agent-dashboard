@@ -115,7 +115,7 @@ export default function PricingPage() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             >
               {Array.from({ length: 12 }, (_, i) => i + 5).map((h) => (
-                <option key={h} value={h}>{h > 12 ? `${h - 12} PM` : `${h} AM`}</option>
+                <option key={h} value={h}>{h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`}</option>
               ))}
             </select>
           </div>
@@ -127,7 +127,7 @@ export default function PricingPage() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             >
               {Array.from({ length: 12 }, (_, i) => i + 14).map((h) => (
-                <option key={h} value={h}>{h > 12 ? `${h - 12} PM` : `${h} AM`}</option>
+                <option key={h} value={h}>{h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`}</option>
               ))}
             </select>
           </div>

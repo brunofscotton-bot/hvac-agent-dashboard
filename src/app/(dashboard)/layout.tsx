@@ -109,8 +109,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1">{children}</div>
         <footer className="mt-12 border-t border-gray-100 pt-4 pb-2 text-center text-xs text-gray-400">
           &copy; 2026 Ringa &middot;{" "}
-          <a href="/terms" className="hover:text-gray-600 underline">Terms of Service</a> &middot;{" "}
-          <a href="/privacy" className="hover:text-gray-600 underline">Privacy Policy</a>
+          <a href="#" className="hover:text-gray-600 underline">Terms of Service</a> &middot;{" "}
+          <a href="#" className="hover:text-gray-600 underline">Privacy Policy</a>
         </footer>
       </main>
     </div>
