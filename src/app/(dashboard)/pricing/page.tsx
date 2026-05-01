@@ -95,13 +95,19 @@ export default function PricingPage() {
             <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="number"
+              min={0}
+              max={company.after_hours_fee}
               value={company.after_hours_credit ?? 80}
-              onChange={(e) => setCompany({ ...company, after_hours_credit: Number(e.target.value) })}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                const clamped = Math.max(0, Math.min(v, company.after_hours_fee));
+                setCompany({ ...company, after_hours_credit: clamped });
+              }}
               className="w-full rounded-lg border border-gray-300 py-2 pl-8 pr-3 text-sm"
             />
           </div>
           <p className="mt-1 text-xs text-gray-400">
-            Of the ${company.after_hours_fee} after-hours fee, this amount is credited toward the repair cost. The rest is a surcharge.
+            Of the ${company.after_hours_fee} after-hours fee, this amount is credited toward the repair cost. The rest is a surcharge. Cannot exceed the after-hours fee.
           </p>
         </div>
 
@@ -155,7 +161,7 @@ export default function PricingPage() {
           <p className="mt-2 text-sm text-blue-700">
             &ldquo;Our diagnostic visit fee is ${company.service_fee} during business hours.
             For after-hours and weekend visits, the fee is ${company.after_hours_fee}
-            {" "}(${company.after_hours_credit ?? 80} applied to repair, ${company.after_hours_fee - (company.after_hours_credit ?? 80)} surcharge).
+            {" "}(${Math.min(company.after_hours_credit ?? 80, company.after_hours_fee)} applied to repair, ${Math.max(0, company.after_hours_fee - (company.after_hours_credit ?? 80))} surcharge).
             {company.fee_applies_to_service && " The visit fee is applied toward the cost of repairs if you choose to proceed with the service."}
             &rdquo;
           </p>
