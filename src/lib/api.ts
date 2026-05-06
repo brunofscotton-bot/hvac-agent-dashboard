@@ -647,6 +647,81 @@ export const getQuotes = (status?: string) =>
   fetchAPI<Quote[]>(`/quotes${status ? `?status=${status}` : ""}`);
 export const getQuoteStats = () => fetchAPI<QuoteStats>("/quotes/stats");
 
+export interface CreateQuoteInput {
+  customer_id: string;
+  technician_id?: string;
+  appointment_id?: string;
+  diagnosis: string;
+  diagnosis_notes?: string;
+  line_items: Array<{
+    pricebook_item_id?: string;
+    name?: string;
+    description?: string;
+    price_good?: number;
+    price_better?: number;
+    price_best?: number;
+    quantity: number;
+  }>;
+}
+export const createQuote = (data: CreateQuoteInput) =>
+  fetchAPI<{ id: string; customer_token: string; status: string }>("/quotes", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const sendQuote = (id: string) =>
+  fetchAPI<{ success: boolean; approval_url: string; sms_sent: boolean }>(
+    `/quotes/${id}/send`,
+    { method: "POST" }
+  );
+
+// Public (customer-facing) quote API — no auth needed
+export interface PublicQuote {
+  id: string;
+  status: string;
+  diagnosis: string;
+  diagnosis_notes?: string;
+  selected_tier?: "good" | "better" | "best" | null;
+  total_amount?: number | null;
+  sent_at?: string | null;
+  approved_at?: string | null;
+  company: {
+    name: string;
+    phone: string;
+    tagline?: string;
+    brand_primary_color?: string;
+    brand_accent_color?: string;
+  };
+  customer: { name: string; address: string } | null;
+  technician: { name: string } | null;
+  line_items: Array<{
+    name: string;
+    description?: string;
+    price_good: number;
+    price_better: number;
+    price_best: number;
+    quantity: number;
+  }>;
+  totals: { good: number; better: number; best: number };
+}
+export const getPublicQuote = async (token: string): Promise<PublicQuote> => {
+  const res = await fetch(`${API_BASE}/quotes/public/${token}`);
+  if (!res.ok) throw new Error("Quote not found");
+  return res.json();
+};
+export const approvePublicQuote = async (
+  token: string,
+  tier: "good" | "better" | "best"
+): Promise<{ success: boolean; total: number }> => {
+  const res = await fetch(`${API_BASE}/quotes/public/${token}/approve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tier }),
+  });
+  if (!res.ok) throw new Error("Approve failed");
+  return res.json();
+};
+
 export interface AdminInfraCosts {
   period: string;
   twilio_phone_numbers: number;
