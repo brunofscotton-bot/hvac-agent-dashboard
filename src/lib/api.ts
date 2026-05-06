@@ -653,6 +653,7 @@ export interface CreateQuoteInput {
   appointment_id?: string;
   diagnosis: string;
   diagnosis_notes?: string;
+  selected_tier?: "good" | "better" | "best";
   line_items: Array<{
     pricebook_item_id?: string;
     name?: string;
@@ -685,14 +686,16 @@ export interface PublicQuote {
   total_amount?: number | null;
   sent_at?: string | null;
   approved_at?: string | null;
+  tax_rate: number;
   company: {
     name: string;
     phone: string;
+    address?: string;
     tagline?: string;
     brand_primary_color?: string;
     brand_accent_color?: string;
   };
-  customer: { name: string; address: string } | null;
+  customer: { name: string; address: string; phone: string } | null;
   technician: { name: string } | null;
   line_items: Array<{
     name: string;
@@ -702,6 +705,8 @@ export interface PublicQuote {
     price_best: number;
     quantity: number;
   }>;
+  subtotals: { good: number; better: number; best: number };
+  tax: { good: number; better: number; best: number };
   totals: { good: number; better: number; best: number };
 }
 export const getPublicQuote = async (token: string): Promise<PublicQuote> => {

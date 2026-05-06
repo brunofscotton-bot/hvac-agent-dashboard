@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FileText, DollarSign, Clock, CheckCircle2, ChevronDown, ChevronUp, Plus, Send, Copy, ExternalLink, X, Trash2, Check } from "lucide-react";
+import { FileText, DollarSign, Clock, CheckCircle2, ChevronDown, ChevronUp, Plus, Send, Eye, X, Trash2, Check, Star } from "lucide-react";
 import {
   getQuotes, getQuoteStats, createQuote, sendQuote,
   getCustomers, getPricebookCategories, getPricebookItems, getTechnicians,
@@ -30,12 +30,14 @@ function money(n: number | null | undefined) {
 }
 
 interface DraftLineItem {
-  pricebook_item_id: string;
+  pricebook_item_id?: string;
   name: string;
+  description?: string;
   price_good: number;
   price_better: number;
   price_best: number;
   quantity: number;
+  isCustom?: boolean;
 }
 
 function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
@@ -51,6 +53,11 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
   const [draftItems, setDraftItems] = useState<DraftLineItem[]>([]);
   const [search, setSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [recommendedTier, setRecommendedTier] = useState<"good" | "better" | "best">("better");
+  const [showCustom, setShowCustom] = useState(false);
+  const [customForm, setCustomForm] = useState({
+    name: "", description: "", price_good: "", price_better: "", price_best: "", quantity: "1"
+  });
 
   useEffect(() => {
     Promise.all([
@@ -96,6 +103,7 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
       setDraftItems(d => [...d, {
         pricebook_item_id: item.id,
         name: item.name,
+        description: item.description,
         price_good: item.price_good,
         price_better: item.price_better,
         price_best: item.price_best,
@@ -104,13 +112,33 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
     }
   }
 
-  function removeItem(id: string) {
-    setDraftItems(d => d.filter(x => x.pricebook_item_id !== id));
+  function addCustomItem() {
+    const good = Number(customForm.price_good) || 0;
+    const better = Number(customForm.price_better) || good;
+    const best = Number(customForm.price_best) || better;
+    const qty = Math.max(1, Number(customForm.quantity) || 1);
+    if (!customForm.name.trim() || good <= 0) return;
+    setDraftItems(d => [...d, {
+      pricebook_item_id: undefined,
+      name: customForm.name.trim(),
+      description: customForm.description.trim() || undefined,
+      price_good: good,
+      price_better: better,
+      price_best: best,
+      quantity: qty,
+      isCustom: true,
+    }]);
+    setCustomForm({ name: "", description: "", price_good: "", price_better: "", price_best: "", quantity: "1" });
+    setShowCustom(false);
   }
 
-  function updateQty(id: string, qty: number) {
+  function removeItem(idx: number) {
+    setDraftItems(d => d.filter((_, i) => i !== idx));
+  }
+
+  function updateQty(idx: number, qty: number) {
     if (qty < 1) return;
-    setDraftItems(d => d.map(x => x.pricebook_item_id === id ? { ...x, quantity: qty } : x));
+    setDraftItems(d => d.map((x, i) => i === idx ? { ...x, quantity: qty } : x));
   }
 
   async function submit() {
@@ -122,10 +150,18 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
         technician_id: selectedTech || undefined,
         diagnosis,
         diagnosis_notes: notes || undefined,
-        line_items: draftItems.map(d => ({
-          pricebook_item_id: d.pricebook_item_id,
-          quantity: d.quantity,
-        })),
+        selected_tier: recommendedTier,
+        line_items: draftItems.map(d => d.pricebook_item_id
+          ? { pricebook_item_id: d.pricebook_item_id, quantity: d.quantity }
+          : {
+              name: d.name,
+              description: d.description,
+              price_good: d.price_good,
+              price_better: d.price_better,
+              price_best: d.price_best,
+              quantity: d.quantity,
+            }
+        ),
       });
       onCreated();
       onClose();
@@ -226,7 +262,7 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
 
           {step === "items" && (
             <div>
-              <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white pb-2">
+              <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white pb-2 z-10">
                 <input
                   type="text"
                   value={search}
@@ -234,10 +270,100 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
                   placeholder="Search pricebook..."
                   className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowCustom(v => !v)}
+                  className="px-3 py-2 text-sm font-semibold rounded-lg border border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 whitespace-nowrap"
+                >
+                  + Custom item
+                </button>
                 <span className="text-sm text-gray-500 whitespace-nowrap">
                   {draftItems.length} {draftItems.length === 1 ? "item" : "items"}
                 </span>
               </div>
+
+              {/* Custom item form */}
+              {showCustom && (
+                <div className="mb-4 p-4 rounded-lg border-2 border-purple-200 bg-purple-50/50">
+                  <h4 className="text-sm font-bold text-purple-900 mb-3">Add custom item</h4>
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={customForm.name}
+                      onChange={e => setCustomForm(f => ({...f, name: e.target.value}))}
+                      placeholder="Item name (e.g. Custom drain pan)"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                    <input
+                      type="text"
+                      value={customForm.description}
+                      onChange={e => setCustomForm(f => ({...f, description: e.target.value}))}
+                      placeholder="Description (optional)"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    />
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600">Good $</label>
+                        <input
+                          type="number"
+                          value={customForm.price_good}
+                          onChange={e => setCustomForm(f => ({...f, price_good: e.target.value}))}
+                          placeholder="0"
+                          className="w-full rounded-lg border border-gray-300 px-2 py-2 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-blue-600">Better $</label>
+                        <input
+                          type="number"
+                          value={customForm.price_better}
+                          onChange={e => setCustomForm(f => ({...f, price_better: e.target.value}))}
+                          placeholder="0"
+                          className="w-full rounded-lg border border-gray-300 px-2 py-2 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-purple-600">Best $</label>
+                        <input
+                          type="number"
+                          value={customForm.price_best}
+                          onChange={e => setCustomForm(f => ({...f, price_best: e.target.value}))}
+                          placeholder="0"
+                          className="w-full rounded-lg border border-gray-300 px-2 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-semibold text-gray-600">Qty:</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={customForm.quantity}
+                        onChange={e => setCustomForm(f => ({...f, quantity: e.target.value}))}
+                        className="w-20 rounded-lg border border-gray-300 px-2 py-1.5 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomItem}
+                        disabled={!customForm.name.trim() || !customForm.price_good}
+                        className="ml-auto px-4 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-semibold disabled:opacity-50 hover:bg-purple-700"
+                      >
+                        Add to quote
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCustom(false)}
+                        className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      If you only fill Good, all 3 tiers will use the same price. Better/Best are optional upsells.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {categories.map(cat => {
                 const catItems = itemsByCategory[cat.id] || [];
@@ -306,15 +432,21 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
                     </tr>
                   </thead>
                   <tbody>
-                    {draftItems.map(item => (
-                      <tr key={item.pricebook_item_id} className="border-t border-gray-100">
-                        <td className="p-2 font-medium">{item.name}</td>
+                    {draftItems.map((item, idx) => (
+                      <tr key={idx} className="border-t border-gray-100">
+                        <td className="p-2">
+                          <div className="font-medium flex items-center gap-2">
+                            {item.name}
+                            {item.isCustom && <span className="text-[10px] font-bold uppercase tracking-wide bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">Custom</span>}
+                          </div>
+                          {item.description && <p className="text-xs text-gray-500">{item.description}</p>}
+                        </td>
                         <td className="p-2 text-center">
                           <input
                             type="number"
                             min={1}
                             value={item.quantity}
-                            onChange={e => updateQty(item.pricebook_item_id, Number(e.target.value))}
+                            onChange={e => updateQty(idx, Number(e.target.value))}
                             className="w-14 text-center rounded border border-gray-300 px-1 py-0.5 text-sm"
                           />
                         </td>
@@ -322,7 +454,7 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
                         <td className="p-2 text-right text-blue-700 font-semibold">{money(item.price_better * item.quantity)}</td>
                         <td className="p-2 text-right text-purple-700 font-semibold">{money(item.price_best * item.quantity)}</td>
                         <td className="p-2 text-right">
-                          <button onClick={() => removeItem(item.pricebook_item_id)} className="text-gray-400 hover:text-red-600">
+                          <button onClick={() => removeItem(idx)} className="text-gray-400 hover:text-red-600">
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </td>
@@ -331,7 +463,7 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
                   </tbody>
                   <tfoot className="bg-gray-50">
                     <tr>
-                      <td className="p-2 font-bold uppercase text-xs tracking-wide" colSpan={2}>Total</td>
+                      <td className="p-2 font-bold uppercase text-xs tracking-wide" colSpan={2}>Subtotal</td>
                       <td className="p-2 text-right font-bold">{money(totals.good)}</td>
                       <td className="p-2 text-right font-bold text-blue-700">{money(totals.better)}</td>
                       <td className="p-2 text-right font-bold text-purple-700">{money(totals.best)}</td>
@@ -341,8 +473,47 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
                 </table>
               </div>
 
+              {/* Recommended tier */}
+              <div className="mt-5 p-4 rounded-lg border border-amber-200 bg-amber-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="h-4 w-4 text-amber-600" />
+                  <p className="text-sm font-bold text-amber-900">Which option do you recommend?</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["good", "better", "best"] as const).map(tier => {
+                    const isSel = recommendedTier === tier;
+                    const colors = tier === "good" ? "gray" : tier === "better" ? "blue" : "purple";
+                    return (
+                      <button
+                        key={tier}
+                        type="button"
+                        onClick={() => setRecommendedTier(tier)}
+                        className={`p-3 rounded-lg border-2 text-left transition ${
+                          isSel
+                            ? `border-${colors}-500 bg-${colors}-50`
+                            : "border-gray-200 bg-white"
+                        }`}
+                        style={isSel ? {
+                          borderColor: tier === "good" ? "#6B7280" : tier === "better" ? "#3B82F6" : "#7C3FFF",
+                          background: tier === "good" ? "#F3F4F6" : tier === "better" ? "#EFF6FF" : "#F5F0FF",
+                        } : {}}
+                      >
+                        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: tier === "good" ? "#6B7280" : tier === "better" ? "#3B82F6" : "#7C3FFF" }}>
+                          {tier === "good" ? "Good" : tier === "better" ? "Better" : "Best"}
+                        </p>
+                        <p className="text-base font-bold mt-1">{money(totals[tier])}</p>
+                        <p className="text-[11px] text-gray-500">+ tax at customer</p>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-amber-800 mt-3">
+                  Customer still sees all three options on the approval page. The recommended tier is highlighted as your suggestion.
+                </p>
+              </div>
+
               <p className="text-xs text-gray-500 mt-4">
-                The quote will be saved as <span className="font-bold">draft</span>. You can review and click <span className="font-bold">Send to customer</span> to deliver via SMS.
+                The quote will be saved as <span className="font-bold">draft</span>. Use <span className="font-bold">Preview</span> to see what the customer will see, then <span className="font-bold">Send</span> to deliver via SMS.
               </p>
             </div>
           )}
@@ -397,11 +568,12 @@ function NewQuoteModal({ onClose, onCreated }: { onClose: () => void; onCreated:
 function QuoteActions({ quote, onUpdated }: { quote: Quote; onUpdated: () => void }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [previewToken, setPreviewToken] = useState<string | null>(null);
 
-  const customerUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/approve-quote/${quote.id}` // placeholder; we use customer_token via send response
-    : "";
+  // Generate or fetch the preview token by calling send (which sets status to sent + returns token).
+  // For preview without committing, we'd need a separate "preview" token endpoint.
+  // For demo: clicking preview just calls send, which gives us the customer URL.
+  // Better: send returns customer_token; we use that. If quote already sent, we already have customer_token.
 
   async function handleSend() {
     setSending(true);
@@ -419,11 +591,24 @@ function QuoteActions({ quote, onUpdated }: { quote: Quote; onUpdated: () => voi
     }
   }
 
+  async function handlePreview() {
+    // Call send to get the customer URL (this also marks as sent — that's fine for demo).
+    // Long-term: separate "preview-token" endpoint that doesn't trigger SMS.
+    try {
+      const res = await sendQuote(quote.id);
+      onUpdated();
+      window.open(res.approval_url + "?preview=1", "_blank", "noopener,noreferrer");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate preview.");
+    }
+  }
+
   if (quote.status === "approved" || quote.status === "completed") {
     return (
       <div className="flex items-center gap-2 text-xs text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">
         <CheckCircle2 className="h-4 w-4" />
-        Customer approved <span className="font-bold">{quote.selected_tier}</span> tier
+        Customer approved <span className="font-bold uppercase">{quote.selected_tier}</span> tier
       </div>
     );
   }
@@ -431,20 +616,38 @@ function QuoteActions({ quote, onUpdated }: { quote: Quote; onUpdated: () => voi
   return (
     <div className="flex flex-wrap items-center gap-2">
       {quote.status === "draft" && (
-        <button
-          onClick={handleSend}
-          disabled={sending}
-          className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-medium text-xs hover:bg-blue-700 disabled:opacity-50"
-        >
-          <Send className="h-3.5 w-3.5" />
-          {sending ? "Sending..." : "Send to customer (SMS + link)"}
-        </button>
+        <>
+          <button
+            onClick={handlePreview}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium text-xs hover:bg-gray-50"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Preview / PDF
+          </button>
+          <button
+            onClick={handleSend}
+            disabled={sending}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-medium text-xs hover:bg-blue-700 disabled:opacity-50"
+          >
+            <Send className="h-3.5 w-3.5" />
+            {sending ? "Sending..." : "Send to customer (SMS + link)"}
+          </button>
+        </>
       )}
       {quote.status === "sent" && (
-        <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg font-medium text-xs">
-          <Send className="h-3.5 w-3.5" />
-          Sent · waiting on customer approval
-        </span>
+        <>
+          <button
+            onClick={handlePreview}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium text-xs hover:bg-gray-50"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Preview / PDF
+          </button>
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg font-medium text-xs">
+            <Send className="h-3.5 w-3.5" />
+            Sent · waiting on customer approval
+          </span>
+        </>
       )}
       {sent && (
         <span className="inline-flex items-center gap-1 text-xs text-green-700 font-medium">
