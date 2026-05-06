@@ -48,7 +48,13 @@ export const getAppointments = (params?: string) =>
   fetchAPI<PaginatedResponse<Appointment>>(`/appointments${params ? `?${params}` : ""}`);
 export const getTodayAppointments = () => fetchAPI<Appointment[]>("/appointments/today");
 export const getAppointment = (id: string) => fetchAPI<Appointment>(`/appointments/${id}`);
-export const updateAppointment = (id: string, data: Partial<Appointment>) =>
+export interface AppointmentUpdateInput extends Partial<Appointment> {
+  scheduled_date?: string;  // ISO 8601
+  technician_id?: string;
+  notify_customer?: boolean;
+  notify_technician?: boolean;
+}
+export const updateAppointment = (id: string, data: AppointmentUpdateInput) =>
   fetchAPI(`/appointments/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 
 // Technicians

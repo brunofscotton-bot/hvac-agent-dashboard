@@ -17,8 +17,9 @@ import {
   Wrench,
   FileText,
   Save,
+  Send,
 } from "lucide-react";
-import { getAppointment, updateAppointment, type Appointment } from "@/lib/api";
+import { getAppointment, updateAppointment, getTechnicians, type Appointment, type Technician } from "@/lib/api";
 
 const statusColors: Record<string, string> = {
   scheduled: "bg-blue-100 text-blue-700",
@@ -61,22 +62,80 @@ export default function AppointmentDetailPage() {
   const [resolution, setResolution] = useState("");
   const [leadSource, setLeadSource] = useState("");
 
+  // Reschedule fields
+  const [techList, setTechList] = useState<Technician[]>([]);
+  const [scheduledLocal, setScheduledLocal] = useState(""); // datetime-local string
+  const [techId, setTechId] = useState("");
+  const [origScheduled, setOrigScheduled] = useState("");
+  const [origTechId, setOrigTechId] = useState("");
+  const [notifyCustomer, setNotifyCustomer] = useState(true);
+  const [notifyTech, setNotifyTech] = useState(true);
+  const [rescheduling, setRescheduling] = useState(false);
+  const [rescheduleMsg, setRescheduleMsg] = useState<string | null>(null);
+
+  function toLocalInput(iso: string): string {
+    // Format ISO datetime to YYYY-MM-DDTHH:MM for <input type="datetime-local">
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    getAppointment(id)
-      .then((appt) => {
+    Promise.all([getAppointment(id), getTechnicians()])
+      .then(([appt, techs]) => {
         setAppointment(appt);
         setStatus(appt.status);
         setTechnicianNotes(appt.technician_notes ?? "");
         setResolution(appt.resolution ?? "");
         setLeadSource(appt.lead_source ?? "");
+        setTechList(techs);
+        const localDate = toLocalInput(appt.scheduled_date);
+        setScheduledLocal(localDate);
+        setOrigScheduled(localDate);
+        setTechId(appt.technician?.id ?? "");
+        setOrigTechId(appt.technician?.id ?? "");
       })
       .catch((err) => {
         setError(err.message || "Appointment not found");
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const hasRescheduleChanges = scheduledLocal !== origScheduled || techId !== origTechId;
+
+  async function handleReschedule() {
+    if (!hasRescheduleChanges) return;
+    setRescheduling(true);
+    setRescheduleMsg(null);
+    try {
+      // Convert local datetime back to ISO with seconds
+      const iso = new Date(scheduledLocal).toISOString();
+      await updateAppointment(id, {
+        scheduled_date: iso,
+        technician_id: techId || undefined,
+        notify_customer: notifyCustomer,
+        notify_technician: notifyTech,
+      });
+      // Reload
+      const fresh = await getAppointment(id);
+      setAppointment(fresh);
+      const newLocal = toLocalInput(fresh.scheduled_date);
+      setScheduledLocal(newLocal);
+      setOrigScheduled(newLocal);
+      setOrigTechId(fresh.technician?.id ?? "");
+      const parts = [];
+      if (notifyCustomer) parts.push("customer");
+      if (notifyTech) parts.push("technician");
+      setRescheduleMsg(`Updated. SMS sent to ${parts.join(" + ") || "no one"}.`);
+      setTimeout(() => setRescheduleMsg(null), 4000);
+    } catch (err: any) {
+      setRescheduleMsg(err.message || "Failed to update");
+    } finally {
+      setRescheduling(false);
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true);
@@ -229,6 +288,77 @@ export default function AppointmentDetailPage() {
             <p className="mt-2 text-sm text-gray-600 leading-relaxed">
               {appointment.problem_description || "No description provided."}
             </p>
+          </div>
+
+          {/* Reschedule Section */}
+          <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <Clock className="h-4 w-4 text-blue-500" />
+              Reschedule / change technician
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Change the appointment time or assigned technician. Customer and tech can be notified by SMS.
+            </p>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600">Date & time</label>
+                <input
+                  type="datetime-local"
+                  value={scheduledLocal}
+                  onChange={(e) => setScheduledLocal(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600">Technician</label>
+                <select
+                  value={techId}
+                  onChange={(e) => setTechId(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">— unassigned —</option>
+                  {techList.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={notifyCustomer}
+                  onChange={(e) => setNotifyCustomer(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                SMS the customer
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={notifyTech}
+                  onChange={(e) => setNotifyTech(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                SMS the technician
+              </label>
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
+              <button
+                onClick={handleReschedule}
+                disabled={!hasRescheduleChanges || rescheduling}
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Send className="h-4 w-4" />
+                {rescheduling ? "Updating..." : hasRescheduleChanges ? "Update & notify" : "No changes"}
+              </button>
+              {rescheduleMsg && (
+                <span className="text-xs text-green-700 font-medium">{rescheduleMsg}</span>
+              )}
+            </div>
           </div>
 
           {/* Edit Section */}
