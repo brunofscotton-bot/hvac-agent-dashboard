@@ -19,6 +19,7 @@ import {
   BookOpen,
   Star,
   Megaphone,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -52,6 +53,7 @@ const navGroups: NavGroup[] = [
     label: "Business",
     items: [
       { href: "/pricebook", label: "Pricebook", icon: BookOpen },
+      { href: "/quotes", label: "Quotes", icon: FileText },
       { href: "/pricing", label: "Service Fees", icon: DollarSign },
       { href: "/billing", label: "Billing", icon: CreditCard },
     ],

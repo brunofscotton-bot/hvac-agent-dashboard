@@ -595,6 +595,58 @@ export interface PricebookItem {
   sort_order: number;
 }
 
+// ─── Quotes / Orçamentos ──────────────────────────────────────────
+export interface QuoteLineItem {
+  id: string;
+  name: string;
+  description?: string;
+  price_good: number;
+  price_better: number;
+  price_best: number;
+  quantity: number;
+}
+export interface QuoteCustomer {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+}
+export interface QuoteTechnician {
+  id: string;
+  name: string;
+}
+export interface QuoteAppointment {
+  id: string;
+  scheduled_date: string | null;
+  problem_description: string;
+  status: string;
+}
+export interface Quote {
+  id: string;
+  diagnosis: string;
+  diagnosis_notes?: string;
+  status: string;
+  selected_tier?: "good" | "better" | "best" | null;
+  total_amount?: number | null;
+  created_at: string;
+  sent_at?: string | null;
+  approved_at?: string | null;
+  customer: QuoteCustomer | null;
+  technician: QuoteTechnician | null;
+  appointment: QuoteAppointment | null;
+  line_items: QuoteLineItem[];
+  totals: { good: number; better: number; best: number };
+}
+export interface QuoteStats {
+  total: number;
+  by_status: Record<string, number>;
+  revenue_approved: number;
+  pipeline_value: number;
+}
+export const getQuotes = (status?: string) =>
+  fetchAPI<Quote[]>(`/quotes${status ? `?status=${status}` : ""}`);
+export const getQuoteStats = () => fetchAPI<QuoteStats>("/quotes/stats");
+
 export interface AdminInfraCosts {
   period: string;
   twilio_phone_numbers: number;
