@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const isPublic = pathname === LANDING_PATH || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
     const isLanding = pathname === LANDING_PATH;
-    const isStaticPage = pathname === "/terms" || pathname === "/privacy" || pathname.startsWith("/reset-password") || pathname.startsWith("/review");
+    const isStaticPage = pathname === "/terms" || pathname === "/privacy" || pathname.startsWith("/reset-password") || pathname.startsWith("/review") || pathname.startsWith("/approve-quote") || pathname.startsWith("/quote/");
 
     if (!token && !isPublic) {
       router.replace("/login");
