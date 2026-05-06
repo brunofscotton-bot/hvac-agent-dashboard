@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import { getAppointments, type Appointment, type PaginatedResponse } from "@/lib/api";
 import { EmptyState, SkeletonRows } from "@/components/empty-state";
+import { NewAppointmentModal } from "@/components/new-appointment-modal";
 
 const statusColors: Record<string, string> = {
   scheduled: "bg-blue-100 text-blue-700",
@@ -34,8 +35,9 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [showNew, setShowNew] = useState(false);
 
-  useEffect(() => {
+  function reload() {
     setLoading(true);
     const params = new URLSearchParams();
     params.set("page", String(page));
@@ -45,7 +47,8 @@ export default function AppointmentsPage() {
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [page, statusFilter]);
+  }
+  useEffect(() => { reload(); /* eslint-disable-next-line */ }, [page, statusFilter]);
 
   const items = data?.items ?? [];
 
@@ -56,7 +59,15 @@ export default function AppointmentsPage() {
           <h1 className="text-2xl font-bold">Appointments</h1>
           <p className="mt-1 text-gray-500">Manage all service appointments</p>
         </div>
+        <button
+          onClick={() => setShowNew(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 self-start"
+        >
+          <Plus className="h-4 w-4" />
+          New appointment
+        </button>
       </div>
+      {showNew && <NewAppointmentModal onClose={() => setShowNew(false)} onCreated={reload} />}
 
       {/* Filters */}
       <div className="mt-4 flex gap-3 sm:mt-6">

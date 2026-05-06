@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phone, Clock, Globe, ChevronDown, ChevronUp, PhoneOff } from "lucide-react";
+import { Phone, Clock, Globe, ChevronDown, ChevronUp, PhoneOff, PhoneIncoming } from "lucide-react";
 import { getRecentCalls, type CallLog, type PaginatedResponse } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { EmptyState, SkeletonRows } from "@/components/empty-state";
+import { LogCallModal } from "@/components/log-call-modal";
 
 const outcomeColors: Record<string, string> = {
   appointment_booked: "bg-green-100 text-green-700",
@@ -67,16 +68,18 @@ export default function CallsPage() {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [showLog, setShowLog] = useState(false);
 
   const retention = TRANSCRIPT_RETENTION[company?.subscription_plan ?? "starter"] ?? TRANSCRIPT_RETENTION.starter;
 
-  useEffect(() => {
+  function reload() {
     setLoading(true);
     getRecentCalls(page, 20)
       .then(setData)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [page]);
+  }
+  useEffect(() => { reload(); /* eslint-disable-next-line */ }, [page]);
 
   const calls = data?.items ?? [];
 
@@ -93,8 +96,20 @@ export default function CallsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Call History</h1>
-      <p className="mt-1 text-gray-500">All incoming calls handled by your Ringa receptionist</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">Call History</h1>
+          <p className="mt-1 text-gray-500">All incoming calls handled by your Ringa receptionist</p>
+        </div>
+        <button
+          onClick={() => setShowLog(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+        >
+          <PhoneIncoming className="h-4 w-4" />
+          Log a call
+        </button>
+      </div>
+      {showLog && <LogCallModal onClose={() => setShowLog(false)} onLogged={reload} />}
 
       <div className="mt-6 overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="min-w-[700px] w-full text-left text-sm">

@@ -57,6 +57,49 @@ export interface AppointmentUpdateInput extends Partial<Appointment> {
 export const updateAppointment = (id: string, data: AppointmentUpdateInput) =>
   fetchAPI(`/appointments/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 
+export interface ManualAppointmentInput {
+  customer_id?: string;
+  new_customer_name?: string;
+  new_customer_phone?: string;
+  new_customer_address?: string;
+  new_customer_language?: "en" | "pt" | "es";
+  technician_id?: string;
+  scheduled_date: string;
+  problem_description: string;
+  urgency?: string;
+  visit_fee?: number;
+  is_after_hours?: boolean;
+  service_category?: string;
+  equipment_type?: string;
+  equipment_brand?: string;
+  equipment_age?: string;
+  property_type?: string;
+  lead_source?: string;
+  notify_customer?: boolean;
+  notify_technician?: boolean;
+}
+export const createAppointment = (data: ManualAppointmentInput) =>
+  fetchAPI<{ id: string; customer_id: string; scheduled_date: string }>("/appointments", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export interface ManualCallInput {
+  caller_phone: string;
+  duration_seconds?: number;
+  language_detected?: string;
+  outcome: string;
+  summary: string;
+  notes?: string;
+  started_at?: string;
+  appointment_id?: string;
+}
+export const logManualCall = (data: ManualCallInput) =>
+  fetchAPI<{ id: string; outcome: string }>("/dashboard/calls", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
 // Technicians
 export const getTechnicians = () => fetchAPI<Technician[]>("/technicians");
 export const createTechnician = (data: Partial<Technician>) =>
